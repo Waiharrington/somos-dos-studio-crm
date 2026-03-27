@@ -120,7 +120,7 @@ export function CalendarView({ appointments, onDeleteAction }: Props) {
                   className={cn(
                     "relative h-24 md:h-32 rounded-3xl p-3 flex flex-col items-center border transition-all cursor-pointer group",
                     !isCurrentMonth ? "bg-gray-50/30 text-gray-200 border-transparent opacity-40" : "bg-white border-brand-primary/50/50 hover:border-brand-primary/200 hover:shadow-lg hover:shadow-pink-100/50",
-                    isSelected && "border-brand-primary/20 ring-2 ring-Somos Dos Studio-primary/10 shadow-xl shadow-pink-100",
+                    isSelected && "border-brand-primary/20 ring-2 ring-somos-dos-primary/10 shadow-xl shadow-pink-100",
                     isToday && "bg-brand-primary/50/30"
                   )}
                 >
@@ -135,7 +135,7 @@ export function CalendarView({ appointments, onDeleteAction }: Props) {
                   {/* Indicadores de citas */}
                   <div className="flex flex-wrap justify-center gap-1 mt-auto">
                     {dayAppointments.slice(0, 3).map((_, i) => (
-                      <div key={i} className="w-1.5 h-1.5 rounded-full bg-Somos Dos Studio-primary animate-pulse" />
+                      <div key={i} className="w-1.5 h-1.5 rounded-full bg-somos-dos-primary animate-pulse" />
                     ))}
                     {dayAppointments.length > 3 && (
                       <span className="text-[8px] font-black text-brand-primary/60">+{dayAppointments.length - 3}</span>

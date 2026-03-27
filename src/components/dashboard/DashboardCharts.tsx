@@ -92,7 +92,7 @@ export function DashboardCharts() {
 
         <div className="grid grid-cols-2 gap-4 pt-4">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-Somos Dos Studio-primary" />
+            <div className="w-3 h-3 rounded-full bg-somos-dos-primary" />
             <span className="text-[10px] font-bold text-gray-600 uppercase">Limpieza ({facialPercentage}%)</span>
           </div>
           <div className="flex items-center gap-2">

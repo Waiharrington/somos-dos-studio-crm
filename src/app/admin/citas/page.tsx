@@ -242,7 +242,7 @@ export default function AgendaPage() {
                                                                         onClick={() => handleStatusChange(app.id, status)}
                                                                         className={cn(
                                                                             "px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all whitespace-nowrap border",
-                                                                            app.status === status ? "bg-Somos Dos Studio-primary text-white border-brand-primary/20 shadow-sm" : "bg-white text-gray-400 border-brand-primary/50 hover:border-brand-primary/200"
+                                                                            app.status === status ? "bg-somos-dos-primary text-white border-brand-primary/20 shadow-sm" : "bg-white text-gray-400 border-brand-primary/50 hover:border-brand-primary/200"
                                                                         )}
                                                                     >
                                                                         {STATUS_CONFIG[status].label}

@@ -8,9 +8,9 @@ const buttonVariants = cva(
     {
         variants: {
             variant: {
-                default: "bg-Somos Dos Studio-primary text-white hover:bg-Somos Dos Studio-primary/90 shadow-lg shadow-brand-primary/20/20",
-                outline: "border border-brand-primary/20 text-brand-primary bg-transparent hover:bg-Somos Dos Studio-primary/5",
-                ghost: "hover:bg-Somos Dos Studio-light/20 text-brand-primary",
+                default: "bg-somos-dos-primary text-white hover:bg-somos-dos-primary/90 shadow-lg shadow-brand-primary/20/20",
+                outline: "border border-brand-primary/20 text-brand-primary bg-transparent hover:bg-somos-dos-primary/5",
+                ghost: "hover:bg-somos-dos-light/20 text-brand-primary",
                 glass: "bg-white/40 backdrop-blur-md border border-white/50 text-brand-primary hover:bg-white/60 shadow-sm",
                 link: "text-primary underline-offset-4 hover:underline",
             },

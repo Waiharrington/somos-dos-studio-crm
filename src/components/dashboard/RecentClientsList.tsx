@@ -69,7 +69,7 @@ export function RecentClientsList({ patients }: { patients: Cliente[] }) {
                   </div>
 
                   {/* Acción */}
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-50 text-gray-400 group-hover:bg-Somos Dos Studio-primary group-hover:text-white transition-all shadow-sm">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-50 text-gray-400 group-hover:bg-somos-dos-primary group-hover:text-white transition-all shadow-sm">
                     <ChevronRight className="w-5 h-5" />
                   </div>
                 </div>

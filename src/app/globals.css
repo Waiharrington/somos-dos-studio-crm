@@ -6,14 +6,14 @@
 }
 
 @theme {
-  --color-Somos Dos Studio-primary: #B34D7F;
-  --color-Somos Dos Studio-light: #D6B1C1;
-  --color-Somos Dos Studio-white: #FFFFFF;
-  --color-Somos Dos Studio-gray-light: #D9D9D9;
-  --color-Somos Dos Studio-gray-medium: #BFBFBF;
+  --color-somos-dos-primary: #B34D7F;
+  --color-somos-dos-light: #D6B1C1;
+  --color-somos-dos-white: #FFFFFF;
+  --color-somos-dos-gray-light: #D9D9D9;
+  --color-somos-dos-gray-medium: #BFBFBF;
   
-  --background-image-Somos Dos Studio-gradient: linear-gradient(135deg, #D685A9 0%, #9D4D76 100%);
-  --background-image-Somos Dos Studio-gradient-soft: linear-gradient(135deg, #FDF2F8 0%, #fce7f3 100%);
+  --background-image-somos-dos-gradient: linear-gradient(135deg, #D685A9 0%, #9D4D76 100%);
+  --background-image-somos-dos-gradient-soft: linear-gradient(135deg, #FDF2F8 0%, #fce7f3 100%);
 }
 
 :root {
@@ -57,7 +57,7 @@ body {
   background: linear-gradient(120deg, #fdf2f8 0%, #f3f4f6 100%);
 }
 
-.Somos Dos Studio-glow {
+.somos-dos-glow {
   box-shadow: 0 0 20px rgba(214, 133, 169, 0.2);
 }
 

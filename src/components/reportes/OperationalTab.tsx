@@ -37,7 +37,7 @@ export default function OperationalTab() {
 
             {/* ── TOP STATS ── */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-gradient-to-br from-Somos Dos Studio-primary to-[#9D4D76] p-6 rounded-[2.5rem] text-white flex items-center justify-between shadow-xl shadow-pink-900/10">
+                <div className="bg-gradient-to-br from-somos-dos-primary to-[#9D4D76] p-6 rounded-[2.5rem] text-white flex items-center justify-between shadow-xl shadow-pink-900/10">
                     <div>
                         <p className="text-brand-primary/100 text-[10px] font-black uppercase tracking-widest mb-1">Efectividad Global</p>
                         <h4 className="text-3xl font-black">
@@ -170,7 +170,7 @@ export default function OperationalTab() {
                                             <div className="flex items-center gap-3">
                                                 <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
                                                     <div
-                                                        className="h-full bg-Somos Dos Studio-primary"
+                                                        className="h-full bg-somos-dos-primary"
                                                         style={{ width: `${percentage}%`, backgroundColor: COLORS[i % COLORS.length] }}
                                                     />
                                                 </div>
