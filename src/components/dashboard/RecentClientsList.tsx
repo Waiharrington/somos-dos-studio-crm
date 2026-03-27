@@ -5,7 +5,7 @@ import { ChevronRight, Clock, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-type Patient = {
+type Cliente = {
   id: string;
   first_name: string;
   last_name: string;
@@ -15,7 +15,7 @@ type Patient = {
   alert_level?: number;
 };
 
-export function RecentPatientsList({ patients }: { patients: Patient[] }) {
+export function RecentClientsList({ patients }: { patients: Cliente[] }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between px-2">

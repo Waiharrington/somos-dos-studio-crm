@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getPatientsAction } from "@/app/actions/patients";
+import { getClientesAction } from "@/app/actions/clientes";
 import { WidgetRecordatorios } from "@/components/dashboard/WidgetRecordatorios";
 import { WelcomeHero } from "@/components/dashboard/WelcomeHero";
 import { StatsGrid } from "@/components/dashboard/StatsGrid";
-import { RecentPatientsList } from "@/components/dashboard/RecentPatientsList";
+import { RecentClientsList } from "@/components/dashboard/RecentClientsList";
 import { DashboardCharts } from "@/components/dashboard/DashboardCharts";
 import { CalendarCarousel } from "@/components/dashboard/CalendarCarousel";
 import { motion, AnimatePresence } from "framer-motion";
@@ -31,7 +31,7 @@ export default function AdminDashboard() {
         const fetchDashboardData = async () => {
             setIsLoading(true);
             try {
-                const result = await getPatientsAction();
+                const result = await getClientesAction();
                 if (result.success) {
                     setPatients(result.data || []);
                 }
@@ -90,7 +90,7 @@ export default function AdminDashboard() {
                     <DashboardCharts />
 
                     {/* Recent Patients */}
-                    <RecentPatientsList patients={recentPatients} />
+                    <RecentClientsList patients={recentPatients} />
                 </div>
 
                 {/* --- LADO DERECHO (4 de 12) --- */}

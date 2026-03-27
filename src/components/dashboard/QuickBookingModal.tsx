@@ -6,9 +6,10 @@ import { X, Search, UserPlus, Calendar, Clock, Loader2, CheckCircle2 } from "luc
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { getPatientByIdNumberAction } from "@/app/actions/patients";
+import { getClienteByIdNumberAction } from "@/app/actions/clientes";
 import { createAppointmentAction } from "@/app/actions/appointments";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 interface QuickBookingModalProps {
   isOpen: boolean;
@@ -35,12 +36,12 @@ export function QuickBookingModal({ isOpen, onClose, onSuccess }: QuickBookingMo
     setSearchLoading(true);
     setFoundPatient(null);
     try {
-      const res = await getPatientByIdNumberAction(idNumber);
+      const res = await getClienteByIdNumberAction(idNumber);
       if (res.success && res.data) {
         setFoundPatient(res.data);
-        toast.success("cliente encontrado");
+        toast.success("Cliente encontrado");
       } else {
-        toast.error("cliente no encontrado");
+        toast.error("Cliente no encontrado");
       }
     } catch (error) {
       toast.error("Error al buscar cliente");
@@ -267,5 +268,3 @@ export function QuickBookingModal({ isOpen, onClose, onSuccess }: QuickBookingMo
     </div>
   );
 }
-
-const cn = (...classes: (string | boolean | undefined)[]) => classes.filter(Boolean).join(" ");
