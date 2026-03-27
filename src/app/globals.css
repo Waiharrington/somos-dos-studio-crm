@@ -1,0 +1,100 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #4a4a4a;
+}
+
+@theme {
+  --color-Somos Dos Studio-primary: #B34D7F;
+  --color-Somos Dos Studio-light: #D6B1C1;
+  --color-Somos Dos Studio-white: #FFFFFF;
+  --color-Somos Dos Studio-gray-light: #D9D9D9;
+  --color-Somos Dos Studio-gray-medium: #BFBFBF;
+  
+  --background-image-Somos Dos Studio-gradient: linear-gradient(135deg, #D685A9 0%, #9D4D76 100%);
+  --background-image-Somos Dos Studio-gradient-soft: linear-gradient(135deg, #FDF2F8 0%, #fce7f3 100%);
+}
+
+:root {
+  --background: #FDF2F8;
+  --foreground: #1a1a1a; /* Darker for better contrast */
+  --medical-blue-soft: #e0f2fe; 
+  --card-shadow: 0 8px 32px 0 rgba(157, 77, 118, 0.08);
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Utilities */
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Glassmorphism manually extended */
+.glass {
+  background: rgba(255, 255, 255, 0.4);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: var(--card-shadow);
+  border-radius: 2rem;
+}
+
+.medical-gradient-bg {
+  background: linear-gradient(120deg, #fdf2f8 0%, #f3f4f6 100%);
+}
+
+.Somos Dos Studio-glow {
+  box-shadow: 0 0 20px rgba(214, 133, 169, 0.2);
+}
+
+
+/* Animaciones Personalizadas */
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
+
+.animate-gradient-slow {
+  animation: gradient 8s ease infinite;
+  background-size: 200% auto;
+}
+
+/* Textura de Ruido (Noise) para efecto Papel */
+.bg-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
