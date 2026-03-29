@@ -2,7 +2,7 @@
 
 import { type ClienteFormData } from "@/lib/schemas";
 import { revalidatePath } from "next/cache";
-import { sendNewPatientNotification } from "@/lib/email"; // TODO: Rename this too later
+import { sendNewPatientNotification } from "@/lib/email";
 import { createClient } from "@/lib/supabase-server";
 
 /**
@@ -13,60 +13,83 @@ export async function saveClienteAction(formData: ClienteFormData) {
     try {
         const supabase = await createClient();
         const { personal, discovery, scope, treatment } = formData;
+        let patientId: string;
+        let generatedId = `SD-${Date.now()}`;
 
-        // Se generará un ID temporal porque la DB lo requiere,
-        // pero ya no lo pedimos en el formulario.
-        const generatedId = `SD-${Date.now()}`;
-
-        const { data, error } = await supabase
+        // 1. BUSCAR CLIENTE EXISTENTE POR TELÉFONO
+        const { data: existingPatient, error: searchError } = await supabase
             .from("patients")
-            .insert([
-                {
+            .select("id, id_number")
+            .eq("phone", personal.phone)
+            .maybeSingle();
+
+        if (searchError) throw searchError;
+
+        if (existingPatient) {
+            patientId = existingPatient.id;
+            generatedId = existingPatient.id_number;
+            
+            // Opcional: Actualizar datos (email, dirección, nombre) si cambiaron
+            await supabase
+                .from("patients")
+                .update({
                     first_name: personal.firstName,
                     last_name: personal.lastName,
-                    age: null,
-                    id_number: generatedId,
-                    phone: personal.phone,
                     address: personal.address,
                     email: personal.email || null,
+                })
+                .eq("id", patientId);
+        } else {
+            // 2. CREAR NUEVO CLIENTE
+            const { data: newPatient, error: insertError } = await supabase
+                .from("patients")
+                .insert([
+                    {
+                        first_name: personal.firstName,
+                        last_name: personal.lastName,
+                        id_number: generatedId,
+                        phone: personal.phone,
+                        address: personal.address,
+                        email: personal.email || null,
+                        signature_data: "N/A (CRM Interno)",
+                        consent_accepted: true,
+                        status: 'Prospecto'
+                    }
+                ])
+                .select()
+                .single();
 
-                    // Legacy database columns that we keep for backward compatibility
-                    // but won't use for agency CRM leads
-                    has_surgeries: false,
-                    surgeries_details: null,
-                    has_allergies: false,
-                    allergies_details: null,
-                    has_illnesses: false,
-                    illnesses_details: null,
-                    takes_medication: false,
-                    medication_details: null,
-
-                    smokes: false,
-                    smoking_amount: null,
-                    exercises: false,
-                    exercise_details: null,
-                    sun_exposure: false,
-                    skin_routine: null,
-
-                    treatment_type: "agency_project",
-                    treatment_details: {
-                        services: discovery,
-                        scope: scope,
-                        project: treatment
-                    },
-
-                    signature_data: "N/A (CRM Interno)",
-                    consent_accepted: true,
-                    status: 'Prospecto'
-                }
-            ])
-            .select();
-
-        if (error) {
-            console.error("Supabase Error:", error);
-            return { success: false, error: error.message };
+            if (insertError) throw insertError;
+            patientId = newPatient.id;
         }
 
+        // 3. CREAR EL PROYECTO (TREATMENT PLAN)
+        // Mapeamos los campos del formulario a la estructura del plan
+        const projectName = discovery.selectedServices?.join(", ") || "Nuevo Proyecto";
+        const budgetValue = parseFloat(scope.agreedBudget?.replace(/[^0-9.]/g, '') || "0");
+
+        const { error: planError } = await supabase
+            .from("treatment_plans")
+            .insert([
+                {
+                    patient_id: patientId,
+                    treatment_name: projectName,
+                    total_sessions: 1, // En agencia, 1 proyecto = 1 plan usualmente
+                    price_total: budgetValue,
+                    payment_type: scope.paymentMode?.toLowerCase() || "custom",
+                    notes: `
+OBJETIVO: ${treatment.objective || "N/A"}
+REFERENCIAS: ${treatment.references || "N/A"}
+RESUMEN ACORDADO: ${discovery.agreedSummary || "N/A"}
+PAGO PERSONALIZADO: ${scope.customPaymentDetails || "N/A"}
+                    `.trim(),
+                    status: "active"
+                }
+            ]);
+
+        if (planError) throw planError;
+
+        // 4. NOTIFICACIÓN
         sendNewPatientNotification({
             firstName: personal.firstName,
             lastName: personal.lastName,
@@ -76,8 +99,9 @@ export async function saveClienteAction(formData: ClienteFormData) {
 
         revalidatePath("/admin");
         revalidatePath("/admin/clientes");
+        revalidatePath(`/admin/clientes/${patientId}`);
 
-        return { success: true, data: data[0] };
+        return { success: true, data: { id: patientId } };
     } catch (err: unknown) {
         console.error("Action Error:", err);
         const errorMessage = err instanceof Error ? err.message : "Error desconocido al guardar";

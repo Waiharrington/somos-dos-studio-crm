@@ -64,9 +64,9 @@ export async function createTreatmentPlanAction(input: CreatePlanInput) {
     revalidatePath(`/admin/clientes/${input.patient_id}`);
 
     return { success: true, data };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("createTreatmentPlanAction:", err);
-    return { success: false, error: err.message ?? "Error desconocido" };
+    return { success: false, error: err instanceof Error ? err.message : "Error desconocido" };
   }
 }
 
@@ -98,7 +98,7 @@ export async function getPlansByPatientAction(patient_id: string) {
     // Calcular sesiones completadas por plan
     const plansWithProgress = (plans ?? []).map((plan: any) => {
       const completedSessions = (plan.visits ?? []).filter(
-        (v: any) => v.status === "completed"
+        (v: { status: string }) => v.status === "completed"
       ).length;
 
       return {
@@ -113,9 +113,9 @@ export async function getPlansByPatientAction(patient_id: string) {
     });
 
     return { success: true, data: plansWithProgress };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("getPlansByPatientAction:", err);
-    return { success: false, error: err.message, data: [] };
+    return { success: false, error: err instanceof Error ? err.message : "Error desconocido", data: [] };
   }
 }
 
@@ -150,7 +150,7 @@ export async function getActivePlanAction(patient_id: string) {
     if (!data) return { success: true, data: null };
 
     const completedSessions = (data.visits ?? []).filter(
-      (v: any) => v.status === "completed"
+      (v: { status: string }) => v.status === "completed"
     ).length;
 
     return {
@@ -165,9 +165,9 @@ export async function getActivePlanAction(patient_id: string) {
         visits: undefined,
       },
     };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("getActivePlanAction:", err);
-    return { success: false, error: err.message, data: null };
+    return { success: false, error: err instanceof Error ? err.message : "Error desconocido", data: null };
   }
 }
 
@@ -204,9 +204,9 @@ export async function updateTreatmentPlanAction(
     revalidatePath(`/admin/clientes/${patient_id}`);
 
     return { success: true, data };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("updateTreatmentPlanAction:", err);
-    return { success: false, error: err.message ?? "Error desconocido" };
+    return { success: false, error: err instanceof Error ? err.message : "Error desconocido" };
   }
 }
 
@@ -231,10 +231,38 @@ export async function deleteTreatmentPlanAction(
     }
 
     revalidatePath(`/admin/clientes/${patient_id}`);
-
     return { success: true };
   } catch (err: any) {
     console.error("deleteTreatmentPlanAction:", err);
     return { success: false, error: err.message ?? "Error desconocido" };
+  }
+}
+
+// ─────────────────────────────────────────────
+// OBTENER TODOS LOS PROYECTOS (GLOBAL)
+// ─────────────────────────────────────────────
+
+export async function getAllProjectsAction() {
+  try {
+    const supabase = await createClient();
+    const { data: projects, error } = await supabase
+      .from("treatment_plans")
+      .select(`
+        *,
+        patients (
+          id,
+          first_name,
+          last_name,
+          phone
+        )
+      `)
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    return { success: true, data: projects };
+  } catch (err: any) {
+    console.error("getAllProjectsAction:", err);
+    return { success: false, error: err.message, data: [] };
   }
 }

@@ -289,10 +289,10 @@ function PlanCard({ plan, patientId, onRefresh }: {
 
                 {plan.notes && (
                     <div className="bg-white/5 rounded-[1.5rem] p-5 border border-white/5 shadow-inner">
-                        <p className="text-xs text-slate-400 leading-relaxed italic font-medium">
-                            <span className="text-brand-primary not-italic font-black text-[10px] uppercase tracking-widest mr-2">Observaciones:</span>
-                            &quot;{plan.notes}&quot;
-                        </p>
+                        <div className="text-xs text-slate-400 leading-relaxed font-medium whitespace-pre-line">
+                            <span className="text-brand-primary not-italic font-black text-[10px] uppercase tracking-widest mr-2 block mb-2">Detalles del Proyecto:</span>
+                            {plan.notes}
+                        </div>
                     </div>
                 )}
 

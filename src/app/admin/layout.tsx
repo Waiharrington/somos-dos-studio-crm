@@ -1,8 +1,8 @@
 "use client";
 
-import { LayoutDashboard, Users, Calendar, Settings, LogOut, BarChart2, Package, ChevronLeft, ChevronRight, Plus, Sparkles } from "lucide-react";
+import { LayoutDashboard, Users, Calendar, Settings, LogOut, BarChart2, Package, ChevronLeft, ChevronRight, Plus, Activity } from "lucide-react";
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -64,6 +64,7 @@ export default function AdminLayout({
                 <nav className="flex-1 px-6 space-y-3 mt-4 overflow-x-hidden">
                     <NavItem href="/admin"            icon={<LayoutDashboard className="w-6 h-6" />} active={isActive("/admin")}           label="Panel de Control"   collapsed={isCollapsed} />
                     <NavItem href="/admin/clientes"  icon={<Users           className="w-6 h-6" />} active={isActive("/admin/clientes")} label="Clientes"           collapsed={isCollapsed} />
+                    <NavItem href="/admin/proyectos" icon={<Activity        className="w-6 h-6" />} active={isActive("/admin/proyectos")} label="Proyectos"          collapsed={isCollapsed} />
                     <NavItem href="/admin/citas"       icon={<Calendar        className="w-6 h-6" />} active={isActive("/admin/citas")}      label="Agenda"             collapsed={isCollapsed} />
                     <NavItem href="/admin/inventario" icon={<Package         className="w-6 h-6" />} active={isActive("/admin/inventario")} label="Inventario"         collapsed={isCollapsed} />
                     <NavItem href="/admin/reportes"   icon={<BarChart2       className="w-6 h-6" />} active={isActive("/admin/reportes")}   label="Reportes"           collapsed={isCollapsed} />
