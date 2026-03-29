@@ -29,8 +29,7 @@ export async function saveClienteAction(formData: ClienteFormData) {
             patientId = existingPatient.id;
             generatedId = existingPatient.id_number;
             
-            // Opcional: Actualizar datos (email, dirección, nombre) si cambiaron
-            await supabase
+            const { error: updateError } = await supabase
                 .from("patients")
                 .update({
                     first_name: personal.firstName,
@@ -39,6 +38,8 @@ export async function saveClienteAction(formData: ClienteFormData) {
                     email: personal.email || null,
                 })
                 .eq("id", patientId);
+
+            if (updateError) throw updateError;
         } else {
             // 2. CREAR NUEVO CLIENTE
             const { data: newPatient, error: insertError } = await supabase
@@ -64,8 +65,8 @@ export async function saveClienteAction(formData: ClienteFormData) {
         }
 
         // 3. CREAR EL PROYECTO (TREATMENT PLAN)
-        // Mapeamos los campos del formulario a la estructura del plan
-        const budgetValue = parseFloat(scope.agreedBudget?.replace(/[^0-9.]/g, '') || "0");
+        const budgetRaw = scope.agreedBudget?.replace(/[^0-9.]/g, '') || "0";
+        const budgetValue = isNaN(parseFloat(budgetRaw)) ? 0 : parseFloat(budgetRaw);
 
         const { error: planError } = await supabase
             .from("treatment_plans")
@@ -73,7 +74,7 @@ export async function saveClienteAction(formData: ClienteFormData) {
                 {
                     patient_id: patientId,
                     treatment_name: personal.projectName || "Nuevo Proyecto",
-                    total_sessions: 1, // En agencia, 1 proyecto = 1 plan usualmente
+                    total_sessions: 1,
                     price_total: budgetValue,
                     payment_type: scope.paymentMode?.toLowerCase() || "custom",
                     notes: `
@@ -102,8 +103,16 @@ PAGO PERSONALIZADO: ${scope.customPaymentDetails || "N/A"}
 
         return { success: true, data: { id: patientId } };
     } catch (err: unknown) {
-        console.error("Action Error:", err);
-        const errorMessage = err instanceof Error ? err.message : "Error desconocido al guardar";
+        console.error("saveClienteAction Error:", err);
+        
+        let errorMessage = "Error desconocido al guardar";
+        
+        if (err instanceof Error) {
+            errorMessage = err.message;
+        } else if (typeof err === 'object' && err !== null && 'message' in err) {
+            errorMessage = String((err as any).message);
+        }
+        
         return { success: false, error: errorMessage };
     }
 }
