@@ -38,54 +38,24 @@ export default function DatosPersonales() {
 
             <FormField
                 control={control}
-                name="personal.idNumber"
+                name="personal.phone"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Cédula / ID *</FormLabel>
+                        <FormLabel>Teléfono *</FormLabel>
                         <FormControl>
-                            <Input placeholder="Ej. 12345678" {...field} />
+                            <Input type="tel" placeholder="+58 412..." {...field} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
                 )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
-                <FormField
-                    control={control}
-                    name="personal.age"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Edad *</FormLabel>
-                            <FormControl>
-                                <Input type="number" placeholder="25" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={control}
-                    name="personal.phone"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Teléfono *</FormLabel>
-                            <FormControl>
-                                <Input type="tel" placeholder="+58 412..." {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-            </div>
-
             <FormField
                 control={control}
                 name="personal.address"
                 render={({ field }) => (
-                    <FormItem className="md:col-span-2">
-                        <FormLabel>Residencia (Ciudad / Urbanización) *</FormLabel>
+                    <FormItem>
+                        <FormLabel>Ciudad del cliente *</FormLabel>
                         <FormControl>
                             <Input placeholder="Ej. Caracas, Las Mercedes" {...field} />
                         </FormControl>

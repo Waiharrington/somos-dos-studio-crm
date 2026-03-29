@@ -1,17 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { MessageCircle, Calendar, AlertCircle, CheckCircle, RefreshCw, Loader2, ChevronRight } from "lucide-react";
+import { MessageCircle, Calendar, AlertCircle, CheckCircle, RefreshCw, Loader2, ChevronRight, Bell } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { getPendingFollowUpsAction, type FollowUp } from "@/app/actions/reminders";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-
-// ─────────────────────────────────────────────
-// COMPONENTE PRINCIPAL
-// ─────────────────────────────────────────────
+import { motion, AnimatePresence } from "framer-motion";
 
 export function WidgetRecordatorios() {
   const [followUps, setFollowUps]   = useState<FollowUp[]>([]);
@@ -33,43 +30,48 @@ export function WidgetRecordatorios() {
   const upcoming = followUps.filter((f) => !f.isOverdue);
 
   return (
-    <div className="bg-white rounded-[1.5rem] md:rounded-[2rem] border border-brand-primary/50 shadow-sm shadow-pink-100/50 overflow-hidden">
+    <div className="glass-card overflow-hidden border-white/10 shadow-2xl">
 
       {/* Header */}
-      <div className="flex items-center justify-between px-5 md:px-6 py-4 border-b border-brand-primary/50">
-        <div className="flex items-center gap-2.5">
-          <div className="p-2 bg-brand-primary/50 rounded-xl">
-            <Calendar className="w-4 h-4 text-brand-primary/400" />
+      <div className="flex items-center justify-between px-6 py-5 border-b border-white/5">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 bg-brand-primary/10 rounded-xl text-brand-primary relative">
+            <Bell className="w-5 h-5" />
+            {followUps.length > 0 && (
+              <span className="absolute -top-1 -right-1 w-3 h-3 bg-rose-500 rounded-full border-2 border-[#0A071E] animate-pulse" />
+            )}
           </div>
           <div>
-            <h3 className="font-bold text-gray-800 text-sm md:text-base">Recordatorios</h3>
-            <p className="text-[10px] text-gray-400">clientes que necesitan contacto</p>
+            <h3 className="font-black text-white text-base tracking-tight font-heading">Recordatorios</h3>
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">Seguimiento de Clientes</p>
           </div>
         </div>
         <button
           onClick={() => load(true)}
           disabled={isRefreshing}
-          className="p-2 rounded-full hover:bg-gray-100 text-gray-400 transition-colors"
+          className="p-2.5 rounded-xl hover:bg-white/5 text-slate-500 hover:text-white transition-all active:rotate-180 duration-500"
         >
           <RefreshCw className={cn("w-4 h-4", isRefreshing && "animate-spin")} />
         </button>
       </div>
 
       {/* Body */}
-      <div className="divide-y divide-pink-50">
+      <div className="divide-y divide-white/5 bg-white/[0.02]">
         {isLoading ? (
-          <div className="flex items-center justify-center py-10">
-            <Loader2 className="w-6 h-6 text-brand-primary/400 animate-spin" />
+          <div className="flex flex-col items-center justify-center py-20 gap-4">
+            <Loader2 className="w-8 h-8 text-brand-primary animate-spin" />
+            <p className="text-[10px] font-black text-brand-primary/40 uppercase tracking-[0.3em]">Sincronizando...</p>
           </div>
         ) : followUps.length === 0 ? (
           <AllClearState />
         ) : (
-          <>
+          <AnimatePresence mode="popLayout">
             {/* Vencidas */}
             {overdue.length > 0 && (
               <Section
-                label="Vencidas"
-                icon={<AlertCircle className="w-3.5 h-3.5 text-red-500" />}
+                key="overdue"
+                label="Tickets Vencidos"
+                icon={<AlertCircle className="w-4 h-4 text-rose-400" />}
                 items={overdue}
                 variant="overdue"
               />
@@ -78,22 +80,26 @@ export function WidgetRecordatorios() {
             {/* Próximas */}
             {upcoming.length > 0 && (
               <Section
-                label="Próximas — 14 días"
-                icon={<Calendar className="w-3.5 h-3.5 text-blue-500" />}
+                key="upcoming"
+                label="Próximos Check-ins"
+                icon={<Calendar className="w-4 h-4 text-brand-accent" />}
                 items={upcoming}
                 variant="upcoming"
               />
             )}
-          </>
+          </AnimatePresence>
         )}
+      </div>
+
+      {/* Footer Link */}
+      <div className="px-6 py-4 bg-white/[0.03] border-t border-white/5">
+         <Link href="/admin/clientes" className="flex items-center justify-center gap-2 text-[10px] font-black text-slate-500 hover:text-brand-primary uppercase tracking-[0.2em] transition-colors">
+            Ver Todos los Clientes <ChevronRight className="w-3 h-3" />
+         </Link>
       </div>
     </div>
   );
 }
-
-// ─────────────────────────────────────────────
-// SECCIÓN (vencidas / próximas)
-// ─────────────────────────────────────────────
 
 function Section({ label, icon, items, variant }: {
   label: string;
@@ -102,38 +108,40 @@ function Section({ label, icon, items, variant }: {
   variant: "overdue" | "upcoming";
 }) {
   return (
-    <div>
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
       <div className={cn(
-        "flex items-center gap-2 px-5 md:px-6 py-2.5",
-        variant === "overdue" ? "bg-red-50/50" : "bg-blue-50/30"
+        "flex items-center gap-3 px-6 py-3 border-y border-white/5",
+        variant === "overdue" ? "bg-rose-500/5" : "bg-brand-accent/5"
       )}>
         {icon}
         <span className={cn(
-          "text-[10px] font-black uppercase tracking-widest",
-          variant === "overdue" ? "text-red-500" : "text-blue-500"
+          "text-[10px] font-black uppercase tracking-[0.15em]",
+          variant === "overdue" ? "text-rose-400" : "text-brand-accent"
         )}>
           {label}
         </span>
         <span className={cn(
-          "ml-auto text-[10px] font-black px-2 py-0.5 rounded-full",
-          variant === "overdue" ? "bg-red-100 text-red-600" : "bg-blue-100 text-blue-600"
+          "ml-auto text-[10px] font-black px-2.5 py-0.5 rounded-lg shadow-sm",
+          variant === "overdue" ? "bg-rose-500 text-white" : "bg-brand-accent text-white"
         )}>
           {items.length}
         </span>
       </div>
 
-      {items.map((f) => (
-        <FollowUpRow key={f.visitId} followUp={f} variant={variant} />
-      ))}
-    </div>
+      <div className="divide-y divide-white/5">
+        {items.map((f, idx) => (
+          <FollowUpRow key={f.visitId} followUp={f} variant={variant} delay={idx * 0.05} />
+        ))}
+      </div>
+    </motion.div>
   );
 }
 
-// ─────────────────────────────────────────────
-// FILA DE SEGUIMIENTO
-// ─────────────────────────────────────────────
-
-function FollowUpRow({ followUp: f, variant }: { followUp: FollowUp; variant: "overdue" | "upcoming" }) {
+function FollowUpRow({ followUp: f, variant, delay }: { followUp: FollowUp; variant: "overdue" | "upcoming"; delay: number }) {
   const whatsappUrl = buildWhatsAppUrl(
     f.phone,
     f.patientName,
@@ -151,8 +159,8 @@ function FollowUpRow({ followUp: f, variant }: { followUp: FollowUp; variant: "o
     f.daysUntilVisit === 0  ? "Hoy" :
     f.daysUntilVisit === 1  ? "Mañana" :
     f.daysUntilVisit === -1 ? "Ayer" :
-    f.daysUntilVisit < 0    ? `Hace ${Math.abs(f.daysUntilVisit)} días` :
-    `En ${f.daysUntilVisit} días`;
+    f.daysUntilVisit < 0    ? `Venció hace ${Math.abs(f.daysUntilVisit)} días` :
+    `Inicia en ${f.daysUntilVisit} días`;
 
   const initials = f.patientName
     .split(" ")
@@ -162,64 +170,71 @@ function FollowUpRow({ followUp: f, variant }: { followUp: FollowUp; variant: "o
     .toUpperCase();
 
   return (
-    <div className="flex items-center gap-3 px-5 md:px-6 py-3 hover:bg-gray-50/50 transition-colors">
-
-      {/* Avatar */}
-      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#D685A9]/30 to-[#9D4D76]/30 flex items-center justify-center text-[#9D4D76] font-black text-xs flex-shrink-0">
+    <motion.div 
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay }}
+      className="group flex items-center gap-4 px-6 py-4 hover:bg-white/5 transition-all duration-300"
+    >
+      {/* Avatar Avatar */}
+      <div className="w-10 h-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-brand-primary font-black text-xs flex-shrink-0 group-hover:scale-110 transition-transform">
         {initials}
       </div>
 
-      {/* Info */}
+      {/* Info Info */}
       <div className="flex-1 min-w-0">
         <Link href={`/admin/clientes/${f.patientId}`}>
-          <p className="font-bold text-gray-800 text-sm hover:text-[#9D4D76] transition-colors truncate">
+          <p className="font-bold text-slate-100 text-sm hover:text-brand-primary transition-colors truncate tracking-tight">
             {f.patientName}
           </p>
         </Link>
-        <p className="text-xs text-gray-400 truncate">{f.treatmentApplied}</p>
+        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest truncate mt-0.5">{f.treatmentApplied}</p>
       </div>
 
-      {/* Fecha */}
+      {/* Date Date */}
       <div className="text-right flex-shrink-0 mr-2">
         <p className={cn(
-          "text-xs font-black",
-          variant === "overdue" ? "text-red-500" : "text-blue-500"
+          "text-[10px] font-black uppercase tracking-widest",
+          variant === "overdue" ? "text-rose-400" : "text-brand-accent"
         )}>
           {dayLabel}
         </p>
-        <p className="text-[10px] text-gray-400">{dateLabel}</p>
+        <p className="text-[10px] text-slate-600 font-bold mt-0.5">{dateLabel}</p>
       </div>
 
-      {/* WhatsApp */}
+      {/* Action Action */}
       {f.phone && (
         <a
           href={whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex-shrink-0 p-2 bg-green-50 hover:bg-green-100 text-green-600 rounded-xl transition-colors"
-          title="Enviar recordatorio por WhatsApp"
+          className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-emerald-500/10 hover:bg-emerald-500 text-emerald-500 hover:text-white rounded-xl transition-all group-hover:shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+          title="Enviar recordatorio"
         >
-          <MessageCircle className="w-4 h-4" />
+          <MessageCircle className="w-5 h-5" />
         </a>
       )}
-    </div>
+    </motion.div>
   );
 }
 
-// ─────────────────────────────────────────────
-// ESTADO "TODO AL DÍA"
-// ─────────────────────────────────────────────
-
 function AllClearState() {
   return (
-    <div className="flex flex-col items-center justify-center py-10 gap-3 text-center px-6">
-      <div className="w-14 h-14 bg-green-50 rounded-full flex items-center justify-center">
-        <CheckCircle className="w-7 h-7 text-green-500" />
+    <div className="flex flex-col items-center justify-center py-20 gap-5 text-center px-10">
+      <div className="w-20 h-20 bg-emerald-500/10 rounded-[2rem] flex items-center justify-center border border-emerald-500/20 relative">
+        <CheckCircle className="w-10 h-10 text-emerald-500" />
+        <motion.div 
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1.2, opacity: 1 }}
+            transition={{ repeat: Infinity, duration: 2, repeatType: "reverse" }}
+            className="absolute inset-0 bg-emerald-500/20 rounded-full blur-xl"
+        />
       </div>
-      <div>
-        <p className="font-bold text-gray-700">¡Todo al día!</p>
-        <p className="text-xs text-gray-400 mt-1">
-          No hay citas vencidas ni recordatorios pendientes en los próximos 14 días.
+      <div className="space-y-2">
+        <p className="font-black text-white text-lg font-heading">¡Sistema Optimizado!</p>
+        <p className="text-xs text-slate-500 font-medium leading-relaxed">
+          No tienes tareas de seguimiento pendientes para los próximos 14 días. 
+          Tu roadmap está bajo control.
         </p>
       </div>
     </div>

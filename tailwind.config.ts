@@ -12,24 +12,26 @@ const config: Config = {
                 background: "var(--background)",
                 foreground: "var(--foreground)",
                 brand: {
-                    primary: "#7C3AED", // Violeta Corporativo
-                    secondary: "#10B981", // Verde Esmeralda
-                    dark: "#09090B",
-                    surface: "#18181B",
+                    primary: "#7427A5", // Púrpura Somos Dos
+                    secondary: "#193BB3", // Azul Somos Dos
+                    accent: "#60A5FA", // Azul Claro Acento
+                    dark: "#030014", // Fondo Ultra Dark
+                    surface: "#0A071E", // Superficie Card Dark
                 },
-                // Mantenemos 'maoly' temporalmente mapeado a 'brand' para no romper todo de golpe
+                // Mapeo temporal para evitar rupturas de estilos antiguos
                 maoly: {
-                    primary: "#7C3AED",
-                    light: "#8B5CF6",
+                    primary: "#7427A5",
+                    light: "#9333EA",
                     white: "#FFFFFF",
                     gray: {
-                        light: "#27272A",
-                        medium: "#3F3F46",
+                        light: "#0F172A",
+                        medium: "#1E293B",
                     },
                 },
             },
             fontFamily: {
-                sans: ["var(--font-geist-sans)", "sans-serif"],
+                sans: ["var(--font-inter)", "sans-serif"],
+                heading: ["var(--font-jakarta)", "sans-serif"],
             },
         },
     },

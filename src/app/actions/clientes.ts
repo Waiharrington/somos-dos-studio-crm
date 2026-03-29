@@ -14,15 +14,9 @@ export async function saveClienteAction(formData: ClienteFormData) {
         const supabase = await createClient();
         const { personal, discovery, scope, treatment, signature } = formData;
 
-        // 1. Protección básica contra duplicados
-        const { count } = await supabase
-            .from("patients") // Keep table name for now to avoid breaking existing DB
-            .select("*", { count: 'exact', head: true })
-            .eq("id_number", personal.idNumber);
-
-        if (count && count > 0) {
-            return { success: false, error: "Ya existe un cliente con esta identificación." };
-        }
+        // Se generará un ID temporal porque la DB lo requiere,
+        // pero ya no lo pedimos en el formulario.
+        const generatedId = `SD-${Date.now()}`;
 
         const { data, error } = await supabase
             .from("patients")
@@ -30,8 +24,8 @@ export async function saveClienteAction(formData: ClienteFormData) {
                 {
                     first_name: personal.firstName,
                     last_name: personal.lastName,
-                    age: personal.age ? parseInt(personal.age) : null,
-                    id_number: personal.idNumber,
+                    age: null,
+                    id_number: generatedId,
                     phone: personal.phone,
                     address: personal.address,
                     email: personal.email || null,
@@ -80,7 +74,7 @@ export async function saveClienteAction(formData: ClienteFormData) {
         sendNewPatientNotification({
             firstName: personal.firstName,
             lastName: personal.lastName,
-            idNumber: personal.idNumber,
+            idNumber: generatedId,
             treatmentType: treatment.treatmentType
         }).catch(err => console.error("Error disparando notificación:", err));
 

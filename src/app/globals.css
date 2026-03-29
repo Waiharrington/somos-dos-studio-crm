@@ -1,100 +1,120 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #4a4a4a;
+  --background: #030014;
+  --foreground: #F8FAFC;
+  --brand-primary: #7427A5;
+  --brand-secondary: #193BB3;
+  --brand-accent: #60A5FA;
+  --surface-1: #0A071E;
+  --surface-2: #16112E;
+  --card-shadow: 0 8px 32px 0 rgba(116, 39, 165, 0.2);
 }
 
 @theme {
-  --color-somos-dos-primary: #B34D7F;
-  --color-somos-dos-light: #D6B1C1;
-  --color-somos-dos-white: #FFFFFF;
-  --color-somos-dos-gray-light: #D9D9D9;
-  --color-somos-dos-gray-medium: #BFBFBF;
+  --color-somos-dos-primary: #7427A5;
+  --color-somos-dos-secondary: #193BB3;
+  --color-somos-dos-light: #F8FAFC;
+  --color-somos-dos-gray-light: #1E293B;
+  --color-somos-dos-gray-medium: #334155;
   
-  --background-image-somos-dos-gradient: linear-gradient(135deg, #D685A9 0%, #9D4D76 100%);
-  --background-image-somos-dos-gradient-soft: linear-gradient(135deg, #FDF2F8 0%, #fce7f3 100%);
-}
-
-:root {
-  --background: #FDF2F8;
-  --foreground: #1a1a1a; /* Darker for better contrast */
-  --medical-blue-soft: #e0f2fe; 
-  --card-shadow: 0 8px 32px 0 rgba(157, 77, 118, 0.08);
+  --background-image-somos-dos-gradient: linear-gradient(135deg, #7427A5 0%, #193BB3 100%);
+  --background-image-somos-dos-gradient-glow: linear-gradient(135deg, #7427A5 0%, #60A5FA 100%);
+  --background-image-somos-dos-gradient-soft: linear-gradient(135deg, rgba(116, 39, 165, 0.1) 0%, rgba(25, 59, 179, 0.1) 100%);
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
   overflow-x: hidden;
 }
 
-/* Utilities */
+h1, h2, h3, h4, .font-heading {
+  font-family: var(--font-jakarta), sans-serif;
+}
+
+/* Utilities: Modern Tech Look */
 .text-balance {
   text-wrap: balance;
 }
 
-/* Glassmorphism manually extended */
+/* Glassmorphism Refined for Dark Mode */
 .glass {
-  background: rgba(255, 255, 255, 0.4);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+  background: rgba(10, 7, 30, 0.7);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.7);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(22, 17, 46, 0.8);
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: var(--card-shadow);
-  border-radius: 2rem;
+  border-radius: 2.5rem;
 }
 
-.medical-gradient-bg {
-  background: linear-gradient(120deg, #fdf2f8 0%, #f3f4f6 100%);
+.brand-glow {
+  box-shadow: 0 0 30px rgba(116, 39, 165, 0.3);
 }
 
-.somos-dos-glow {
-  box-shadow: 0 0 20px rgba(214, 133, 169, 0.2);
+.brand-glow-blue {
+  box-shadow: 0 0 30px rgba(96, 165, 250, 0.2);
 }
 
+.tech-gradient-bg {
+  background: linear-gradient(120deg, #030014 0%, #0A071E 100%);
+}
 
-/* Animaciones Personalizadas */
+/* Decorative Orbs & Radial Glows */
+.radial-glow-purple {
+  background: radial-gradient(circle at center, rgba(116, 39, 165, 0.15) 0%, transparent 70%);
+}
+
+.radial-glow-blue {
+  background: radial-gradient(circle at center, rgba(25, 59, 179, 0.1) 0%, transparent 70%);
+}
+
+/* Animations Personalizadas */
 @keyframes shimmer {
   100% {
     transform: translateX(100%);
   }
 }
 
-@keyframes gradient {
-  0% {
-    background-position: 0% 50%;
-  }
-
-  50% {
-    background-position: 100% 50%;
-  }
-
-  100% {
-    background-position: 0% 50%;
-  }
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
 }
 
 .animate-shimmer {
   animation: shimmer 2s infinite;
 }
 
-
-.animate-gradient-slow {
-  animation: gradient 8s ease infinite;
-  background-size: 200% auto;
+.animate-float {
+  animation: float 4s ease-in-out infinite;
 }
 
-/* Textura de Ruido (Noise) para efecto Papel */
+/* Noise Texture for depth */
 .bg-noise {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
   background-repeat: repeat;
+}
+
+/* Scrollbar Style */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+::-webkit-scrollbar-thumb {
+  background: #1e1b4b;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brand-primary);
 }

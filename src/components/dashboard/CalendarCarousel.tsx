@@ -38,16 +38,16 @@ export function CalendarCarousel() {
   return (
     <div className="glass-card p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <h4 className="text-lg font-black text-gray-900">Agenda Semanal</h4>
+        <h4 className="text-lg font-black text-white">Agenda Semanal</h4>
         <div className="flex items-center gap-2">
           <button 
             onClick={() => setIsModalOpen(true)}
-            className="w-8 h-8 rounded-xl bg-brand-primary/50 text-brand-primary flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all shadow-sm"
+            className="w-8 h-8 rounded-xl bg-brand-primary/10 text-brand-primary flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all shadow-sm border border-brand-primary/20"
             title="Agendado Rápido"
           >
             <span className="text-lg font-bold">+</span>
           </button>
-          <span className="text-[10px] font-black text-brand-primary uppercase tracking-widest bg-brand-primary/50 px-2 py-1 rounded-lg">
+          <span className="text-[10px] font-black text-brand-primary uppercase tracking-widest bg-brand-primary/10 px-2 py-1 rounded-lg border border-brand-primary/20">
             {format(today, "MMMM yyyy", { locale: es })}
           </span>
         </div>
@@ -63,8 +63,8 @@ export function CalendarCarousel() {
               className={cn(
                 "flex-shrink-0 w-12 h-16 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all cursor-pointer",
                 isToday 
-                  ? "bg-brand-primary text-white shadow-lg shadow-pink-200" 
-                  : "bg-gray-50 text-gray-400 border border-gray-100 hover:border-brand-primary/200"
+                  ? "bg-brand-primary text-white shadow-lg shadow-brand-primary/20" 
+                  : "bg-white/5 text-slate-500 border border-white/10 hover:border-brand-primary/30"
               )}
             >
               <span className="text-[9px] font-black uppercase tracking-widest">
@@ -77,28 +77,28 @@ export function CalendarCarousel() {
       </div>
 
       <div className="space-y-4 pt-2">
-        <h5 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Próximas Citas</h5>
+        <h5 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Próximas Citas</h5>
         
         <div className="space-y-3">
           {isLoading ? (
             <div className="flex justify-center py-4">
-              <Loader2 className="w-5 h-5 text-brand-primary/300 animate-spin" />
+              <Loader2 className="w-5 h-5 text-brand-primary/40 animate-spin" />
             </div>
           ) : appointments.length === 0 ? (
-            <p className="text-[10px] text-gray-400 font-medium italic text-center py-4">No hay citas programadas.</p>
+            <p className="text-[10px] text-slate-500 font-medium italic text-center py-4">No hay citas programadas.</p>
           ) : (
             appointments.slice(0, 4).map((appt, i) => (
-              <div key={i} className="group flex items-center gap-4 p-3 rounded-2xl hover:bg-brand-primary/50/50 transition-colors cursor-pointer border border-transparent hover:border-brand-primary/50">
-                <div className="w-10 h-10 rounded-xl bg-brand-primary/100/50 flex items-center justify-center text-brand-primary">
+              <div key={i} className="group flex items-center gap-4 p-3 rounded-2xl hover:bg-white/5 transition-colors cursor-pointer border border-transparent hover:border-white/10">
+                <div className="w-10 h-10 rounded-xl bg-brand-primary/10 flex items-center justify-center text-brand-primary border border-brand-primary/20">
                   <Bell className="w-4 h-4 group-hover:scale-110 transition-transform" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="text-xs font-black text-gray-900 truncate">
+                    <p className="text-xs font-black text-white truncate">
                       {appt.is_guest ? appt.guest_name : `${appt.patients?.first_name} ${appt.patients?.last_name}`}
                     </p>
                     {appt.is_guest && (
-                      <span className="text-[9px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-md uppercase tracking-wider">
+                      <span className="text-[9px] font-bold text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded-md uppercase tracking-wider border border-amber-500/20">
                         Nuevo
                       </span>
                     )}
@@ -107,7 +107,7 @@ export function CalendarCarousel() {
                     <span className="text-[10px] font-bold text-brand-primary">
                       {appt.appointment_time.slice(0, 5)}
                     </span>
-                    <span className="text-[10px] font-medium text-gray-400 truncate">· {appt.treatment_type}</span>
+                    <span className="text-[10px] font-medium text-slate-500 truncate">· {appt.treatment_type}</span>
                   </div>
                 </div>
               </div>
@@ -116,7 +116,7 @@ export function CalendarCarousel() {
         </div>
       </div>
 
-      <button className="w-full py-3 rounded-2xl bg-gray-50 text-gray-400 text-xs font-black uppercase tracking-widest hover:bg-brand-primary/50 hover:text-brand-primary transition-colors border border-gray-100">
+      <button className="w-full py-3 rounded-2xl bg-white/5 text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white/10 hover:text-white transition-all border border-white/10">
         Ver Calendario Completo
       </button>
 

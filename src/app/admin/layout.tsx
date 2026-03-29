@@ -1,7 +1,8 @@
 "use client";
 
-import { LayoutDashboard, Users, Calendar, Settings, LogOut, BarChart2, Package, ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { LayoutDashboard, Users, Calendar, Settings, LogOut, BarChart2, Package, ChevronLeft, ChevronRight, Plus, Sparkles } from "lucide-react";
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -27,58 +28,69 @@ export default function AdminLayout({
     const handleLogout = async () => {
         const supabase = createSupabaseBrowser();
         await supabase.auth.signOut();
-        router.push("/login");
+        router.push("/");
         router.refresh();
     };
 
     return (
-        <div className="flex min-h-screen bg-[#FDF4F7] font-sans text-gray-600 overflow-x-hidden w-full max-w-[100vw]">
+        <div className="flex min-h-screen bg-brand-dark font-sans text-slate-300 overflow-x-hidden w-full max-w-[100vw] tech-gradient-bg">
 
             {/* ── SIDEBAR ── */}
             <aside className={cn(
-                "bg-gradient-to-b from-[#D685A9] to-[#E5BCd4] hidden md:flex flex-col fixed h-full z-40 rounded-r-[3rem] shadow-2xl shadow-pink-200/50 transition-all duration-500 ease-in-out",
+                "hidden md:flex flex-col fixed h-full z-40 transition-all duration-500 ease-in-out glass border-r border-white/10",
                 isCollapsed ? "w-24" : "w-72"
             )}>
                 {/* Toggle Button (Desktop) */}
                 <button 
                     onClick={() => setIsCollapsed(!isCollapsed)}
                     title={isCollapsed ? "Expandir menú" : "Contraer menú"}
-                    className="absolute -right-4 top-12 bg-white text-[#D685A9] p-1.5 rounded-full shadow-lg border border-brand-primary/100 font-bold hover:scale-110 active:scale-95 transition-all z-50 hidden md:flex items-center justify-center group"
+                    className="absolute -right-4 top-12 bg-brand-primary text-white p-2 rounded-full shadow-lg hover:scale-110 active:scale-95 transition-all z-50 hidden md:flex items-center justify-center group"
                 >
                     {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
                 </button>
 
-                {/* Logo */}
-                <div className={cn("p-8 flex justify-center items-center transition-all duration-500", isCollapsed && "px-4")}>
+                {/* Logo Area */}
+                <div className={cn("p-10 flex justify-center items-center transition-all duration-500", isCollapsed && "px-4")}>
                     <div className={cn(
-                        "relative bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-inner border border-white/30 transition-all duration-500",
-                        isCollapsed ? "w-12 h-12" : "w-32 h-16"
+                        "relative bg-white/5 backdrop-blur-md rounded-3xl flex items-center justify-center border border-white/10 transition-all duration-500 group overflow-hidden",
+                        isCollapsed ? "w-14 h-14" : "w-full h-20"
                     )}>
-                        <img src="/logo-Somos Dos Studio.png" alt="Somos Dos Studio" className={cn("object-contain w-full h-full p-2 drop-shadow-sm transition-all", isCollapsed ? "p-3" : "p-2")} />
+                        <div className="absolute inset-0 bg-gradient-to-br from-brand-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <img src="https://www.somosdostudio.com/logo-somosdos.png" alt="Somos Dos Studio" className={cn("object-contain w-full h-full p-4 transition-all drop-shadow-[0_0_10px_rgba(116,39,165,0.4)]", isCollapsed ? "p-4" : "p-5")} />
                     </div>
                 </div>
 
-                {/* Navigation */}
-                <nav className="flex-1 px-4 space-y-2 mt-4 overflow-x-hidden">
-                    <NavItem href="/admin"            icon={<LayoutDashboard className="w-6 h-6" />} active={isActive("/admin")}           label="Dashboard"   collapsed={isCollapsed} />
-                    <NavItem href="/admin/clientes"  icon={<Users           className="w-6 h-6" />} active={isActive("/admin/clientes")} label="clientes"   collapsed={isCollapsed} />
-                    <NavItem href="/admin/citas"       icon={<Calendar        className="w-6 h-6" />} active={isActive("/admin/citas")}      label="Agenda"      collapsed={isCollapsed} />
-                    <NavItem href="/admin/inventario" icon={<Package         className="w-6 h-6" />} active={isActive("/admin/inventario")} label="Inventario"  collapsed={isCollapsed} />
-                    <NavItem href="/admin/reportes"   icon={<BarChart2       className="w-6 h-6" />} active={isActive("/admin/reportes")}   label="Reportes"    collapsed={isCollapsed} />
-                    <NavItem href="/admin/config"     icon={<Settings        className="w-6 h-6" />} active={isActive("/admin/config")}     label="Config"      collapsed={isCollapsed} />
+                {/* Navigation Navigation */}
+                <nav className="flex-1 px-6 space-y-3 mt-4 overflow-x-hidden">
+                    <NavItem href="/admin"            icon={<LayoutDashboard className="w-6 h-6" />} active={isActive("/admin")}           label="Panel de Control"   collapsed={isCollapsed} />
+                    <NavItem href="/admin/clientes"  icon={<Users           className="w-6 h-6" />} active={isActive("/admin/clientes")} label="Clientes"           collapsed={isCollapsed} />
+                    <NavItem href="/admin/citas"       icon={<Calendar        className="w-6 h-6" />} active={isActive("/admin/citas")}      label="Agenda"             collapsed={isCollapsed} />
+                    <NavItem href="/admin/inventario" icon={<Package         className="w-6 h-6" />} active={isActive("/admin/inventario")} label="Inventario"         collapsed={isCollapsed} />
+                    <NavItem href="/admin/reportes"   icon={<BarChart2       className="w-6 h-6" />} active={isActive("/admin/reportes")}   label="Reportes"           collapsed={isCollapsed} />
+                    <NavItem href="/admin/config"     icon={<Settings        className="w-6 h-6" />} active={isActive("/admin/config")}     label="Ajustes"            collapsed={isCollapsed} />
                 </nav>
 
-                {/* Logout */}
-                <div className="p-8">
+                {/* Footer: User & Logout */}
+                <div className="p-8 space-y-6">
+                    <div className={cn("flex items-center gap-4 transition-all", isCollapsed ? "justify-center" : "px-2")}>
+                         <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-primary to-blue-600 flex items-center justify-center text-white font-black shadow-lg">SD</div>
+                         {!isCollapsed && (
+                             <div className="flex flex-col min-w-0">
+                                 <span className="text-sm font-black text-white truncate">Somos Dos Admin</span>
+                                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Master Studio</span>
+                             </div>
+                         )}
+                    </div>
                     <button
                         onClick={handleLogout}
                         className={cn(
-                            "flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-full text-white transition-all mx-auto hover:scale-105",
-                            isCollapsed ? "w-10 h-10" : "w-12 h-12"
+                            "flex items-center justify-center bg-white/5 hover:bg-rose-500/20 border border-white/5 hover:border-rose-500/30 rounded-2xl text-slate-400 hover:text-rose-400 transition-all mx-auto",
+                            isCollapsed ? "w-12 h-12" : "w-full h-12 gap-3"
                         )}
                         title="Cerrar sesión"
                     >
-                        <LogOut className={cn("transition-all", isCollapsed ? "w-4 h-4" : "w-5 h-5")} />
+                        <LogOut className="w-5 h-5" />
+                        {!isCollapsed && <span className="text-xs font-black uppercase tracking-widest">Cerrar Sesión</span>}
                     </button>
                 </div>
             </aside>
@@ -88,46 +100,31 @@ export default function AdminLayout({
                 "flex-1 flex flex-col min-h-screen w-full max-w-full transition-all duration-500 ease-in-out",
                 isCollapsed ? "md:ml-24" : "md:ml-72"
             )}>
-
                 {/* Page Content */}
-                <main className="flex-1 px-4 md:px-12 pt-8 pb-24 md:pb-12 overflow-y-auto">
+                <main className="flex-1 px-4 md:px-16 pt-10 pb-28 md:pb-16 overflow-y-auto">
                     {children}
                 </main>
             </div>
 
             {/* ── MOBILE BOTTOM NAV ── */}
-            <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-brand-primary/100 px-4 py-2 z-30 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] pb-safe">
+            <nav className="md:hidden fixed bottom-6 left-6 right-6 glass border border-white/10 px-6 py-4 z-50 rounded-[2.5rem] shadow-2xl pb-safe">
                 <div className="flex justify-between items-center relative">
-                    {/* Left Group */}
-                    <div className="flex gap-4 items-center">
-                        <MobileNavItem href="/admin"            icon={<LayoutDashboard className="w-5 h-5" />} active={isActive("/admin")}           label="Inicio"    />
-                        <MobileNavItem href="/admin/clientes"  icon={<Users           className="w-5 h-5" />} active={isActive("/admin/clientes")} label="clientes" />
-                        <MobileNavItem href="/admin/inventario" icon={<Package         className="w-5 h-5" />} active={isActive("/admin/inventario")} label="Stock"     />
-                    </div>
-
-                    {/* Center Action */}
-                    <div className="absolute left-1/2 -translate-x-1/2 -top-10">
-                        <Link href="/admin/citas" title="Nueva Cita" className="flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-tr from-[#D685A9] to-[#E5BCd4] text-white shadow-xl shadow-pink-200 border-4 border-white">
-                            <Plus className="w-7 h-7" />
+                    <MobileNavItem href="/admin"            icon={<LayoutDashboard className="w-6 h-6" />} active={isActive("/admin")} />
+                    <MobileNavItem href="/admin/clientes"  icon={<Users           className="w-6 h-6" />} active={isActive("/admin/clientes")} />
+                    
+                    {/* Floating Center Action */}
+                    <div className="absolute left-1/2 -translate-x-1/2 -top-12">
+                        <Link href="/admin/clientes" className="flex items-center justify-center w-16 h-16 rounded-full bg-brand-primary text-white shadow-2xl shadow-brand-primary/40 border-4 border-brand-dark transition-transform active:scale-95">
+                            <Plus className="w-8 h-8" />
                         </Link>
                     </div>
 
-                    {/* Right Group */}
-                    <div className="flex gap-4 items-center">
-                        <MobileNavItem href="/admin/citas"     icon={<Calendar        className="w-5 h-5" />} active={isActive("/admin/citas")}      label="Agenda"    />
-                        <MobileNavItem href="/admin/reportes"  icon={<BarChart2       className="w-5 h-5" />} active={isActive("/admin/reportes")}  label="Reportes"  />
-                        <button
-                            onClick={handleLogout}
-                            className="flex flex-col items-center gap-1 p-2 text-gray-400 hover:text-gray-600 transition-colors"
-                        >
-                            <LogOut className="w-5 h-5" />
-                            <span className="text-[10px] font-medium">Salir</span>
-                        </button>
-                    </div>
+                    <MobileNavItem href="/admin/reportes"  icon={<BarChart2       className="w-6 h-6" />} active={isActive("/admin/reportes")} />
+                    <button onClick={handleLogout} className="p-2 text-slate-500 hover:text-rose-400"><LogOut className="w-6 h-6" /></button>
                 </div>
             </nav>
 
-            <Toaster />
+            <Toaster theme="dark" position="top-center" richColors />
         </div>
     );
 }
@@ -140,22 +137,34 @@ function NavItem({ href, icon, active = false, label, collapsed }: {
     collapsed?: boolean;
 }) {
     return (
-        <Link href={href} className={`
-            group flex items-center gap-4 px-3 py-3 rounded-2xl transition-all duration-300 relative
-            ${active
-                ? "bg-white/20 text-white shadow-inner shadow-black/5 backdrop-blur-md"
-                : "text-white/60 hover:bg-white/10 hover:text-white"}
-        `}>
-            <div className={`p-2 rounded-xl transition-all shrink-0 ${active ? "bg-white text-[#D685A9] shadow-sm" : "bg-transparent group-hover:scale-110"}`}>
+        <Link href={href} className={cn(
+            "group flex items-center gap-5 px-4 py-4 rounded-2xl transition-all duration-300 relative font-heading",
+            active
+                ? "bg-white/5 text-white shadow-[0_0_20px_rgba(116,39,165,0.1)] border border-white/10"
+                : "text-slate-400 hover:bg-white/5 hover:text-white"
+        )}>
+            {/* Active Indicator Bar */}
+            {active && (
+                <motion.div 
+                    layoutId="active-nav"
+                    className="absolute left-0 w-1 h-6 bg-brand-primary rounded-r-full" 
+                />
+            )}
+            
+            <div className={cn(
+                "transition-all duration-300",
+                active ? "text-brand-primary scale-110 drop-shadow-[0_0_8px_rgba(116,39,165,0.6)]" : "group-hover:text-brand-primary"
+            )}>
                 {icon}
             </div>
+            
             {!collapsed && (
-                <span className="font-medium tracking-wide whitespace-nowrap animate-in fade-in slide-in-from-left-2 duration-300">{label}</span>
+                <span className="font-bold text-sm tracking-wide whitespace-nowrap">{label}</span>
             )}
             
             {/* Tooltip when collapsed */}
             {collapsed && (
-                <div className="absolute left-full ml-4 px-3 py-2 bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest rounded-xl opacity-0 invisible group-hover:visible group-hover:opacity-100 transition-all z-50 whitespace-nowrap shadow-xl">
+                <div className="absolute left-full ml-6 px-4 py-2 bg-brand-primary text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-xl opacity-0 invisible group-hover:visible group-hover:opacity-100 transition-all z-50 whitespace-nowrap shadow-2xl">
                     {label}
                 </div>
             )}
@@ -163,19 +172,17 @@ function NavItem({ href, icon, active = false, label, collapsed }: {
     );
 }
 
-function MobileNavItem({ href, icon, active = false, label }: {
+function MobileNavItem({ href, icon, active = false }: {
     href:    string;
     icon:    React.ReactNode;
     active?: boolean;
-    label:   string;
 }) {
     return (
-        <Link href={href} className={`
-            flex flex-col items-center gap-1 p-2 transition-colors
-            ${active ? "text-[#D685A9]" : "text-gray-400 hover:text-gray-600"}
-        `}>
+        <Link href={href} className={cn(
+            "p-2 transition-all duration-300",
+            active ? "text-brand-primary scale-110 drop-shadow-[0_0_8px_rgba(116,39,165,0.6)]" : "text-slate-500"
+        )}>
             {icon}
-            <span className="text-[10px] font-medium">{label}</span>
         </Link>
     );
 }

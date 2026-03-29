@@ -10,6 +10,7 @@ import { uploadPhotoAction, deletePhotoAction, type PhotoType } from "@/app/acti
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { motion, AnimatePresence } from "framer-motion";
 
 // ─────────────────────────────────────────────
 // TIPOS
@@ -34,22 +35,22 @@ type Props = {
 
 const PHOTO_TYPE_LABELS: Record<PhotoType, string> = {
   before: "Boceto / Draft",
-  after: "Entrega Final",
-  progress: "En Progreso",
+  after: "Versión Final",
+  progress: "Desarrollo",
   reference: "Referencia",
 };
 
 const PHOTO_TYPE_STYLES: Record<PhotoType, string> = {
-  before: "bg-amber-50 text-amber-600 border-amber-100",
-  after: "bg-emerald-50 text-emerald-600 border-emerald-100",
-  progress: "bg-blue-50 text-blue-600 border-blue-100",
-  reference: "bg-brand-primary/5 text-brand-primary border-brand-primary/10",
+  before: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+  after: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+  progress: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+  reference: "bg-brand-primary/10 text-brand-primary border-brand-primary/20",
 };
 
 const PROJECT_COMPONENTS = [
-  "UI/UX Design", "Mockups", "Landing Page", "Admin Dashboard",
-  "Frontend", "Backend / API", "Database Schema", "Documentation",
-  "Asset / Logo", "Mobile App", "Social Media",
+  "Diseño UI/UX", "Mockups", "Landing Page", "Panel Admin",
+  "Frontend", "Backend / API", "Esquema DB", "Documentación",
+  "Asset / Logo", "App Móvil", "Social Media",
 ];
 
 // ─────────────────────────────────────────────
@@ -97,12 +98,12 @@ export function TabFotos({ patientId, photos, onRefresh }: Props) {
   };
 
   const handleDelete = async (photo: Photo) => {
-    if (!confirm("¿Eliminar esta foto? Esta acción no se puede deshacer.")) return;
+    if (!confirm("¿Eliminar este archivo? Esta acción es irreversible.")) return;
     setDeletingId(photo.id);
     const result = await deletePhotoAction(photo.id, patientId, photo.storage_path);
     setDeletingId(null);
     if (result.success) {
-      toast.success("Foto eliminada.");
+      toast.success("Archivo eliminado.");
       onRefresh();
     } else {
       toast.error(`Error: ${result.error}`);
@@ -110,7 +111,7 @@ export function TabFotos({ patientId, photos, onRefresh }: Props) {
   };
 
   const handleDeleteSelected = async () => {
-    if (!confirm(`¿Eliminar ${selectedIds.length} fotos seleccionadas?`)) return;
+    if (!confirm(`¿Eliminar ${selectedIds.length} archivos seleccionados?`)) return;
     let errors = 0;
     for (const id of selectedIds) {
       const p = photos.find(x => x.id === id);
@@ -122,16 +123,16 @@ export function TabFotos({ patientId, photos, onRefresh }: Props) {
     setSelectedIds([]);
     setSelectionMode(false);
     onRefresh();
-    if (errors === 0) toast.success("Fotos eliminadas.");
-    else toast.error(`Error eliminando ${errors} fotos.`);
+    if (errors === 0) toast.success("Archivos eliminados.");
+    else toast.error(`Error eliminando ${errors} archivos.`);
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6 animate-in fade-in duration-700">
 
       {/* Barra de acciones */}
-      <div className="flex items-center justify-between gap-3 flex-wrap">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between gap-4 flex-wrap pb-2">
+        <div className="flex items-center gap-3">
           {!compareMode && (
             <Button
               variant="outline"
@@ -141,8 +142,8 @@ export function TabFotos({ patientId, photos, onRefresh }: Props) {
                 setSelectedIds([]);
               }}
               className={cn(
-                "rounded-full border-brand-primary/100 text-sm gap-2",
-                selectionMode && "bg-brand-primary/100 text-[#D685A9] border-[#D685A9]"
+                "rounded-2xl border-white/10 bg-white/5 text-[10px] font-black uppercase tracking-widest px-6 h-12 transition-all",
+                selectionMode && "bg-brand-primary/20 text-brand-primary border-brand-primary/30"
               )}
             >
               {selectionMode ? "Cancelar" : "Seleccionar"}
@@ -153,74 +154,82 @@ export function TabFotos({ patientId, photos, onRefresh }: Props) {
             size="sm"
             onClick={() => setCompareMode(!compareMode)}
             className={cn(
-              "rounded-full border-brand-primary/100 text-sm gap-2",
+              "rounded-2xl border-white/10 bg-white/5 text-[10px] font-black uppercase tracking-widest px-6 h-12 transition-all",
               compareMode && "bg-brand-primary text-white border-brand-primary shadow-lg shadow-brand-primary/20"
             )}
           >
-            <SplitSquareHorizontal className="w-4 h-4" />
-            {compareMode ? "Cerrar Comparador" : "Comparar"}
+            <SplitSquareHorizontal className="w-4 h-4 mr-2" />
+            {compareMode ? "Cerrar Comparador" : "Comparación Visual"}
           </Button>
         </div>
         {!selectionMode && (
           <Button
             onClick={() => setShowUpload(true)}
-            className="bg-brand-primary hover:bg-brand-primary/90 text-white rounded-full px-4 shadow-lg shadow-brand-primary/20 text-sm gap-2 transition-all active:scale-95"
+            className="bg-brand-primary hover:bg-brand-primary/90 text-white rounded-2xl px-8 h-12 shadow-xl shadow-brand-primary/20 text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 border-none"
           >
-            <Camera className="w-4 h-4" />
-            Agregar foto
+            <Camera className="w-4 h-4 mr-2" />
+            Subir Multimedia
           </Button>
         )}
       </div>
 
       {/* Floating Selection Bar */}
-      {selectionMode && selectedIds.length > 0 && (
-        <div className="sticky top-0 z-20 flex items-center justify-between bg-white/80 backdrop-blur-md p-3 rounded-2xl border border-brand-primary/100 shadow-lg animate-in slide-in-from-top-4 duration-300">
-          <p className="text-sm font-bold text-gray-700 ml-2">
-            {selectedIds.length} seleccionada{selectedIds.length !== 1 ? "s" : ""}
-          </p>
-          <div className="flex gap-2">
-            {selectedIds.length === 2 && (
-              <Button size="sm" onClick={handleQuickCompare} className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-full text-xs">
-                Comparar
-              </Button>
-            )}
-            <Button size="sm" variant="outline" onClick={handleDeleteSelected} className="rounded-full text-xs bg-rose-500 hover:bg-rose-600 border-none text-white">
-              <Trash2 className="w-3 h-3 mr-1" />
-              Borrar
-            </Button>
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {selectionMode && selectedIds.length > 0 && (
+            <motion.div 
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 20, opacity: 0 }}
+                className="sticky top-6 z-40 flex items-center justify-between bg-brand-primary/10 backdrop-blur-xl p-4 rounded-3xl border border-brand-primary/30 shadow-2xl"
+            >
+                <p className="text-xs font-black text-white ml-2 uppercase tracking-widest">
+                    {selectedIds.length} elemento{selectedIds.length !== 1 ? "s" : ""} seleccionado{selectedIds.length !== 1 ? "s" : ""}
+                </p>
+                <div className="flex gap-2">
+                    {selectedIds.length === 2 && (
+                    <Button size="sm" onClick={handleQuickCompare} className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl text-[10px] font-black uppercase px-6">
+                        Comparar
+                    </Button>
+                    )}
+                    <Button size="sm" variant="outline" onClick={handleDeleteSelected} className="rounded-2xl text-[10px] font-black uppercase px-6 bg-rose-600 hover:bg-rose-700 border-none text-white shadow-lg shadow-rose-600/20">
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Eliminar
+                    </Button>
+                </div>
+            </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Filtros */}
       {!selectionMode && !compareMode && photos.length > 0 && (
-        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-          <FilterChip active={filterType === "all"} onClick={() => setFilterType("all")}>
-            Todas ({photos.length})
-          </FilterChip>
-          {(["before", "after", "progress", "reference"] as PhotoType[]).map((type) => {
-            const count = photos.filter((p) => p.photo_type === type).length;
-            if (count === 0) return null;
-            return (
-              <FilterChip key={type} active={filterType === type} onClick={() => setFilterType(type)}>
-                {PHOTO_TYPE_LABELS[type]} ({count})
-              </FilterChip>
-            );
-          })}
-        </div>
-      )}
+        <div className="space-y-4">
+            <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+                <FilterChip active={filterType === "all"} onClick={() => setFilterType("all")}>
+                    Todos ({photos.length})
+                </FilterChip>
+                {(["before", "after", "progress", "reference"] as PhotoType[]).map((type) => {
+                    const count = photos.filter((p) => p.photo_type === type).length;
+                    if (count === 0) return null;
+                    return (
+                    <FilterChip key={type} active={filterType === type} onClick={() => setFilterType(type)}>
+                        {PHOTO_TYPE_LABELS[type]} ({count})
+                    </FilterChip>
+                    );
+                })}
+            </div>
 
-      {/* Filtro por zona */}
-      {availableZones.length > 1 && (
-        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-          <FilterChip active={filterZone === "all"} onClick={() => setFilterZone("all")} small>
-            Todas las zonas
-          </FilterChip>
-          {availableZones.map((zone) => (
-            <FilterChip key={zone} active={filterZone === zone} onClick={() => setFilterZone(zone)} small>
-              {zone}
-            </FilterChip>
-          ))}
+            {availableZones.length > 1 && (
+                <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+                    <FilterChip active={filterZone === "all"} onClick={() => setFilterZone("all")} small>
+                        Todos los componentes
+                    </FilterChip>
+                    {availableZones.map((zone) => (
+                        <FilterChip key={zone} active={filterZone === zone} onClick={() => setFilterZone(zone)} small>
+                        {zone}
+                        </FilterChip>
+                    ))}
+                </div>
+            )}
         </div>
       )}
 
@@ -237,11 +246,11 @@ export function TabFotos({ patientId, photos, onRefresh }: Props) {
 
       {/* Galería */}
       {!compareMode && (
-        <>
+        <div className="animate-in fade-in zoom-in-95 duration-500">
           {filteredPhotos.length === 0 ? (
             <EmptyPhotos hasAny={photos.length > 0} />
           ) : (
-            <div className="grid grid-cols-2 gap-3 pb-20">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-20">
               {filteredPhotos.map((photo) => (
                 <PhotoCard
                   key={photo.id}
@@ -255,20 +264,22 @@ export function TabFotos({ patientId, photos, onRefresh }: Props) {
               ))}
             </div>
           )}
-        </>
+        </div>
       )}
 
       {/* Modal de subida */}
-      {showUpload && (
-        <UploadModal
-          patientId={patientId}
-          onClose={() => setShowUpload(false)}
-          onSuccess={() => {
-            setShowUpload(false);
-            onRefresh();
-          }}
-        />
-      )}
+      <AnimatePresence>
+        {showUpload && (
+            <UploadModal
+            patientId={patientId}
+            onClose={() => setShowUpload(false)}
+            onSuccess={() => {
+                setShowUpload(false);
+                onRefresh();
+            }}
+            />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -293,39 +304,39 @@ function PhotoCard({ photo, isDeleting, onDelete, isSelectionMode, isSelected, o
     <div
       onClick={isSelectionMode ? onToggleSelect : undefined}
       className={cn(
-        "relative rounded-[1.5rem] overflow-hidden bg-gray-100 aspect-square group border-2 transition-all cursor-pointer",
-        isSelected ? "border-brand-primary scale-[0.98]" : "border-gray-100"
+        "relative rounded-[2rem] overflow-hidden bg-white/5 aspect-square group border-2 transition-all cursor-pointer",
+        isSelected ? "border-brand-primary scale-[0.98] shadow-2xl shadow-brand-primary/20" : "border-white/5 hover:border-white/10"
       )}
     >
       {photo.url ? (
         <img
           src={photo.url}
           alt={`${label} - ${photo.body_zone ?? ""}`}
-          className={cn("w-full h-full object-cover transition-transform duration-500", isSelected && "opacity-80")}
+          className={cn("w-full h-full object-cover transition-transform duration-700 group-hover:scale-110", isSelected && "opacity-60")}
         />
       ) : (
         <div className="w-full h-full flex items-center justify-center">
-          <ImageIcon className="w-8 h-8 text-gray-300" />
+          <ImageIcon className="w-10 h-10 text-slate-800" />
         </div>
       )}
 
       {/* Checkbox de selección */}
       {isSelectionMode && (
         <div className={cn(
-          "absolute top-2 right-2 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors z-10",
-          isSelected ? "bg-brand-primary border-brand-primary" : "bg-white/50 border-white"
+          "absolute top-4 right-4 w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all z-10",
+          isSelected ? "bg-brand-primary border-brand-primary scale-110" : "bg-black/40 border-white/40"
         )}>
-          {isSelected && <Check className="w-4 h-4 text-white" />}
+          {isSelected && <Check className="w-5 h-5 text-white" />}
         </div>
       )}
 
       {/* Overlay con info (solo si no estamos seleccionando) */}
       {!isSelectionMode && (
         <>
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-40 group-hover:opacity-100 transition-opacity duration-500" />
 
-          <div className="absolute top-2 left-2">
-            <span className={cn("text-[10px] font-black px-2 py-1 rounded-full border", style)}>
+          <div className="absolute top-4 left-4">
+            <span className={cn("text-[9px] font-black px-3 py-1 rounded-lg border uppercase tracking-widest", style)}>
               {label}
             </span>
           </div>
@@ -333,24 +344,26 @@ function PhotoCard({ photo, isDeleting, onDelete, isSelectionMode, isSelected, o
           <button
             onClick={(e) => { e.stopPropagation(); onDelete(); }}
             disabled={isDeleting}
-            className="absolute top-2 right-2 p-1.5 bg-white/90 rounded-full text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all"
+            className="absolute top-4 right-4 p-2.5 bg-rose-600/90 rounded-xl text-white opacity-0 group-hover:opacity-100 transition-all hover:bg-rose-600 shadow-xl"
           >
-            {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+            {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
           </button>
 
-          <div className="absolute bottom-0 left-0 right-0 p-2.5 opacity-0 group-hover:opacity-100 transition-opacity">
-            <p className="text-white text-xs font-bold">{photo.body_zone ?? "Sin zona"}</p>
-            <p className="text-white/80 text-[10px]">{date}</p>
-            {photo.session_number && (
-              <p className="text-white/70 text-[10px]">Sesión #{photo.session_number}</p>
-            )}
+          <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
+            <p className="text-white text-sm font-black tracking-tight">{photo.body_zone ?? "Sin componente"}</p>
+            <div className="flex items-center justify-between mt-1 pt-3 border-t border-white/10">
+                <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest">{date}</p>
+                {photo.session_number && (
+                <p className="text-brand-primary text-[10px] font-black uppercase tracking-widest">Sprint #{photo.session_number}</p>
+                )}
+            </div>
           </div>
         </>
       )}
 
       {/* Indicador de selección si está activo estilo simple */}
       {isSelectionMode && isSelected && (
-        <div className="absolute inset-0 bg-brand-primary/500/10 pointer-events-none" />
+        <div className="absolute inset-0 bg-brand-primary/10 pointer-events-none" />
       )}
     </div>
   );
@@ -368,18 +381,18 @@ function CompareMode({ photos, compareA, compareB, onSelectA, onSelectB }: {
   onSelectB: (p: Photo | null) => void;
 }) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Selector de fotos */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-4">
         <PhotoSelector
-          label="Foto A (Antes)"
+          label="Proyecto A (Referencia)"
           selected={compareA}
           photos={photos}
           onSelect={onSelectA}
           accentColor="rose"
         />
         <PhotoSelector
-          label="Foto B (Después)"
+          label="Proyecto B (Ajuste)"
           selected={compareB}
           photos={photos}
           onSelect={onSelectB}
@@ -389,7 +402,7 @@ function CompareMode({ photos, compareA, compareB, onSelectA, onSelectB }: {
 
       {/* Slider comparación */}
       {compareA?.url && compareB?.url ? (
-        <div className="rounded-[1.5rem] overflow-hidden border border-brand-primary/100 shadow-sm">
+        <div className="rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl relative">
           <ReactCompareSlider
             itemOne={
               <ReactCompareSliderImage
@@ -405,23 +418,30 @@ function CompareMode({ photos, compareA, compareB, onSelectA, onSelectB }: {
                 style={{ objectFit: "cover" }}
               />
             }
-            style={{ height: "340px" }}
+            style={{ height: "460px" }}
           />
-          <div className="flex justify-between text-xs font-bold px-4 py-2 bg-white">
-            <span className="text-rose-500">
-              {PHOTO_TYPE_LABELS[compareA.photo_type]} · {compareA.body_zone ?? "—"} ·{" "}
-              {format(new Date(compareA.taken_at + "T12:00:00"), "d MMM yy", { locale: es })}
-            </span>
-            <span className="text-emerald-500">
-              {PHOTO_TYPE_LABELS[compareB.photo_type]} · {compareB.body_zone ?? "—"} ·{" "}
-              {format(new Date(compareB.taken_at + "T12:00:00"), "d MMM yy", { locale: es })}
-            </span>
+          <div className="absolute bottom-6 inset-x-6 flex justify-between pointer-events-none">
+            <div className="bg-black/60 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/10">
+               <span className="text-rose-400 font-black text-[10px] uppercase tracking-widest">
+                {PHOTO_TYPE_LABELS[compareA.photo_type]} · {compareA.body_zone ?? "General"}
+              </span>
+            </div>
+            <div className="bg-black/60 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/10">
+              <span className="text-emerald-400 font-black text-[10px] uppercase tracking-widest">
+                {PHOTO_TYPE_LABELS[compareB.photo_type]} · {compareB.body_zone ?? "General"}
+              </span>
+            </div>
           </div>
         </div>
       ) : (
-        <div className="bg-gray-50 rounded-2xl p-8 text-center border-2 border-dashed border-gray-200">
-          <SplitSquareHorizontal className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-          <p className="text-gray-500 text-sm font-semibold">Selecciona dos fotos para comparar</p>
+        <div className="glass-card p-24 text-center border-2 border-dashed border-white/5 flex flex-col items-center gap-4">
+          <div className="w-20 h-20 rounded-[2rem] bg-white/5 flex items-center justify-center text-slate-700">
+            <SplitSquareHorizontal className="w-10 h-10" />
+          </div>
+          <div className="space-y-1">
+            <p className="text-white font-black uppercase tracking-widest text-sm">Laboratorio de Comparación</p>
+            <p className="text-slate-500 text-xs font-medium">Selecciona dos capas de desarrollo para analizar visualmente los cambios.</p>
+          </div>
         </div>
       )}
     </div>
@@ -437,61 +457,63 @@ function PhotoSelector({ label, selected, photos, onSelect, accentColor }: {
 }) {
   const [open, setOpen] = useState(false);
   const colors = {
-    rose: { border: "border-rose-200", text: "text-rose-600", bg: "bg-rose-50" },
-    emerald: { border: "border-emerald-200", text: "text-emerald-600", bg: "bg-emerald-50" },
+    rose: { border: "border-rose-500/30", text: "text-rose-400", bg: "bg-rose-500/10" },
+    emerald: { border: "border-emerald-500/30", text: "text-emerald-400", bg: "bg-emerald-500/10" },
   }[accentColor];
 
   return (
-    <div>
-      <p className={cn("text-[10px] font-black uppercase tracking-widest mb-1.5", colors.text)}>
+    <div className="relative">
+      <p className={cn("text-[10px] font-black uppercase tracking-[0.2em] mb-3 ml-2", colors.text)}>
         {label}
       </p>
       <button
         onClick={() => setOpen(!open)}
         className={cn(
-          "w-full rounded-2xl border-2 overflow-hidden transition-all",
-          selected ? colors.border : "border-gray-200"
+          "w-full rounded-[2rem] border-2 overflow-hidden transition-all bg-white/5 aspect-square relative group",
+          selected ? colors.border : "border-white/5 hover:border-white/10"
         )}
       >
         {selected?.url ? (
-          <div className="relative">
-            <img src={selected.url} alt="" className="w-full aspect-square object-cover" />
-            <div className={cn("absolute bottom-0 left-0 right-0 p-2 text-[10px] font-bold text-white", colors.bg)}>
-              <span className={colors.text}>
+          <div className="h-full w-full">
+            <img src={selected.url} alt="" className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+            <div className={cn("absolute bottom-4 left-4 right-4 p-3 rounded-xl backdrop-blur-md border border-white/10", colors.bg)}>
+              <span className={cn("text-[9px] font-black uppercase tracking-widest block", colors.text)}>
                 {PHOTO_TYPE_LABELS[selected.photo_type]} · {selected.body_zone ?? "—"}
               </span>
             </div>
           </div>
         ) : (
-          <div className="aspect-square flex flex-col items-center justify-center gap-1 bg-gray-50">
-            <ImageIcon className="w-6 h-6 text-gray-300" />
-            <p className="text-[10px] text-gray-400">Seleccionar</p>
+          <div className="h-full w-full flex flex-col items-center justify-center gap-3">
+            <div className="p-4 bg-white/5 rounded-2xl border border-white/5 text-slate-600">
+                <ImageIcon className="w-8 h-8" />
+            </div>
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Seleccionar</p>
           </div>
         )}
       </button>
 
       {open && (
-        <div className="mt-1 bg-white rounded-2xl border border-gray-100 shadow-lg overflow-hidden max-h-48 overflow-y-auto z-10">
+        <div className="absolute top-full left-0 right-0 mt-3 glass-card p-3 border-white/10 shadow-3xl overflow-hidden max-h-64 overflow-y-auto z-50 animate-in slide-in-from-top-2">
           {photos.filter((p) => p.url).map((p) => (
             <button
               key={p.id}
               onClick={() => { onSelect(p); setOpen(false); }}
-              className="w-full flex items-center gap-2 px-3 py-2 hover:bg-brand-primary/50 transition-colors text-left"
+              className="w-full flex items-center gap-4 p-3 rounded-2xl hover:bg-white/10 transition-all text-left group"
             >
-              <img src={p.url!} alt="" className="w-8 h-8 rounded-lg object-cover flex-shrink-0" />
-              <div className="min-w-0">
-                <p className="text-xs font-bold text-gray-700 truncate">
-                  {PHOTO_TYPE_LABELS[p.photo_type]} · {p.body_zone ?? "Sin zona"}
+              <img src={p.url!} alt="" className="w-12 h-12 rounded-xl object-cover flex-shrink-0 border border-white/10" />
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-black text-white truncate group-hover:text-brand-primary transition-colors">
+                  {PHOTO_TYPE_LABELS[p.photo_type]}
                 </p>
-                <p className="text-[10px] text-gray-400">
-                  {format(new Date(p.taken_at + "T12:00:00"), "d MMM yy", { locale: es })}
+                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">
+                  {p.body_zone ?? "Sin zona"} · {format(new Date(p.taken_at + "T12:00:00"), "d MMM", { locale: es })}
                 </p>
               </div>
             </button>
           ))}
           <button
             onClick={() => { onSelect(null); setOpen(false); }}
-            className="w-full px-3 py-2 text-xs text-gray-400 hover:bg-gray-50 text-center"
+            className="w-full p-4 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] hover:text-white transition-colors text-center border-t border-white/5 mt-2"
           >
             Deseleccionar
           </button>
@@ -527,7 +549,6 @@ function UploadModal({ patientId, onClose, onSuccess }: {
       toast.error("Solo se permiten imágenes.");
       return;
     }
-    // Comprimir antes de previsualizar
     const compressed = await imageCompression(f, {
       maxSizeMB: 1,
       maxWidthOrHeight: 1920,
@@ -541,12 +562,10 @@ function UploadModal({ patientId, onClose, onSuccess }: {
 
   const handleUpload = async () => {
     if (!file || !preview) {
-      toast.error("Selecciona una foto primero.");
+      toast.error("Selecciona una archivo primero.");
       return;
     }
-
     setIsUploading(true);
-
     const result = await uploadPhotoAction({
       patient_id: patientId,
       photo_type: form.photo_type,
@@ -557,11 +576,9 @@ function UploadModal({ patientId, onClose, onSuccess }: {
       file_name: file.name,
       file_size_kb: Math.round(file.size / 1024),
     });
-
     setIsUploading(false);
-
     if (result.success) {
-      toast.success("Foto subida correctamente.");
+      toast.success("Archivo subido correctamente.");
       onSuccess();
     } else {
       toast.error(`Error: ${result.error}`);
@@ -569,95 +586,88 @@ function UploadModal({ patientId, onClose, onSuccess }: {
   };
 
   return (
-    <>
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" onClick={onClose} />
-      <div className="fixed inset-x-0 bottom-0 z-50 md:inset-0 md:flex md:items-center md:justify-center">
-        <div className="bg-white rounded-t-[2.5rem] md:rounded-[2.5rem] md:w-[480px] w-full max-h-[90vh] flex flex-col shadow-2xl">
-
-          {/* Handle */}
-          <div className="flex justify-center pt-3 pb-1 md:hidden">
-            <div className="w-10 h-1 rounded-full bg-gray-200" />
-          </div>
-
+    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-4">
+        <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-black/80 backdrop-blur-md" 
+            onClick={onClose} 
+        />
+        <motion.div 
+            initial={{ y: 100, opacity: 0, scale: 0.95 }}
+            animate={{ y: 0, opacity: 1, scale: 1 }}
+            exit={{ y: 100, opacity: 0, scale: 0.95 }}
+            className="relative glass-card w-full max-w-xl max-h-[90vh] flex flex-col border-white/10 overflow-hidden shadow-3xl"
+        >
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-brand-primary/50 flex-shrink-0">
-            <h2 className="text-xl font-bold text-gray-800">Agregar foto</h2>
-            <button onClick={onClose} title="Cerrar" className="p-2 rounded-full hover:bg-brand-primary/50 text-gray-400">
-              <X className="w-5 h-5" />
+          <div className="flex items-center justify-between p-8 border-b border-white/5 flex-shrink-0">
+            <div>
+                <h2 className="text-2xl font-black text-white font-heading tracking-tight">Agregar Multimedia</h2>
+                <p className="text-[10px] font-black text-brand-primary uppercase tracking-[0.2em] mt-1">Carga de assets del proyecto</p>
+            </div>
+            <button onClick={onClose} title="Cerrar" className="p-3 rounded-full hover:bg-white/5 text-slate-500 transition-colors">
+              <X className="w-6 h-6" />
             </button>
           </div>
 
           {/* Body */}
-          <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
+          <div className="flex-1 overflow-y-auto p-8 space-y-8 no-scrollbar">
 
-            {/* Zona de previsualización / selección */}
+            {/* Zona de previsualización */}
             {preview ? (
-              <div className="relative rounded-2xl overflow-hidden aspect-square bg-gray-100">
+              <div className="relative rounded-[2rem] overflow-hidden aspect-video bg-white/5 border border-white/10 group">
                 <img src={preview} alt="Preview" className="w-full h-full object-cover" />
                 <button
                   onClick={() => { setPreview(null); setFile(null); }}
-                  title="Quitar foto"
-                  className="absolute top-3 right-3 bg-white/90 p-2 rounded-full text-gray-600 hover:text-red-500"
+                  title="Eliminar"
+                  className="absolute top-4 right-4 bg-rose-600 p-2.5 rounded-xl text-white shadow-xl opacity-0 group-hover:opacity-100 transition-opacity"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-5 h-5" />
                 </button>
-                <div className="absolute bottom-3 left-3 bg-white/80 rounded-xl px-2 py-1 text-xs font-bold text-gray-700">
+                <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md rounded-xl px-4 py-2 text-[10px] font-black text-white border border-white/10">
                   {file ? `${Math.round(file.size / 1024)} KB` : ""}
                 </div>
               </div>
             ) : (
-              <div className="space-y-3">
-                {/* Botón cámara (móvil) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <button
                   onClick={() => cameraInputRef.current?.click()}
-                  className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl border-2 border-dashed border-brand-primary/200 bg-brand-primary/50/50 text-brand-primary/600 font-bold hover:bg-brand-primary/50 transition-colors"
+                  className="group flex flex-col items-center justify-center gap-4 py-12 rounded-[2rem] border-2 border-dashed border-brand-primary/30 bg-brand-primary/5 hover:bg-brand-primary/10 transition-all text-brand-primary"
                 >
-                  <Camera className="w-5 h-5" />
-                  Tomar foto con cámara
+                  <div className="p-4 bg-brand-primary/20 rounded-2xl group-hover:scale-110 transition-transform">
+                    <Camera className="w-8 h-8" />
+                  </div>
+                  <p className="text-[10px] font-black uppercase tracking-widest">Tomar Foto</p>
                 </button>
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 text-gray-500 font-bold hover:bg-gray-100 transition-colors"
+                  className="group flex flex-col items-center justify-center gap-4 py-12 rounded-[2rem] border-2 border-dashed border-white/10 bg-white/5 hover:bg-white/10 transition-all text-slate-500"
                 >
-                  <Upload className="w-5 h-5" />
-                  Seleccionar de la galería
+                  <div className="p-4 bg-white/5 rounded-2xl group-hover:scale-110 transition-transform">
+                    <Upload className="w-8 h-8" />
+                  </div>
+                  <p className="text-[10px] font-black uppercase tracking-widest">Subir Archivo</p>
                 </button>
               </div>
             )}
 
-            {/* Inputs ocultos */}
-            <input
-              ref={cameraInputRef}
-              type="file"
-              accept="image/*"
-              title="Cámara"
-              className="hidden"
-              onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
-            />
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              title="Galería"
-              className="hidden"
-              onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
-            />
+            <input ref={cameraInputRef} type="file" accept="image/*" title="Cámara" className="hidden" onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
+            <input ref={fileInputRef} type="file" accept="image/*" title="Galería" className="hidden" onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
 
             {/* Tipo de foto */}
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-brand-primary/300 uppercase tracking-widest">
-                Tipo de foto
-              </label>
-              <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-4">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-2">Fase de Desarrollo</label>
+              <div className="grid grid-cols-2 gap-3">
                 {(["before", "after", "progress", "reference"] as PhotoType[]).map((type) => (
                   <button
                     key={type}
                     onClick={() => setForm((p) => ({ ...p, photo_type: type }))}
                     className={cn(
-                      "py-2.5 rounded-2xl text-sm font-bold border transition-all",
+                      "py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all",
                       form.photo_type === type
-                        ? "bg-brand-primary text-white border-brand-primary shadow-lg shadow-brand-primary/20"
-                        : "bg-white text-gray-500 border-gray-200 hover:border-brand-primary/20"
+                        ? "bg-brand-primary text-white border-brand-primary shadow-xl shadow-brand-primary/20"
+                        : "bg-white/5 text-slate-500 border-white/5 hover:border-white/20"
                     )}
                   >
                     {PHOTO_TYPE_LABELS[type]}
@@ -667,60 +677,55 @@ function UploadModal({ patientId, onClose, onSuccess }: {
             </div>
 
             {/* Zona corporal */}
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-brand-primary/30 uppercase tracking-widest">
-                Componente de proyecto
-              </label>
+            <div className="space-y-4">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-2">Componente Vinculado</label>
               <select
                 value={form.body_zone}
-                title="Seleccionar zona corporal"
+                title="Seleccionar componente"
                 onChange={(e) => setForm((p) => ({ ...p, body_zone: e.target.value }))}
-                className="w-full h-10 px-3 text-sm rounded-2xl border border-brand-primary/100 bg-white focus:outline-none focus:ring-2 focus:ring-pink-300 text-gray-700"
+                className="w-full h-16 px-6 text-sm font-bold rounded-2xl border border-white/10 bg-white/5 text-white focus:outline-none focus:border-brand-primary/50 transition-all appearance-none"
               >
-                <option value="">Seleccionar componente</option>
+                <option value="" className="bg-brand-dark">Seleccionar componente</option>
                 {PROJECT_COMPONENTS.map((z) => (
-                  <option key={z} value={z}>{z}</option>
+                  <option key={z} value={z} className="bg-brand-dark text-white">{z}</option>
                 ))}
               </select>
             </div>
 
             {/* Notas */}
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-brand-primary/300 uppercase tracking-widest">
-                Notas (opcional)
-              </label>
+            <div className="space-y-4">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-2">Observaciones Técnicas</label>
               <textarea
-                placeholder="Ej: Foto tomada bajo luz natural. Se aprecia reducción del 60%."
+                placeholder="Ej: Ajustes de tipografía y contraste en la versión móvil..."
                 value={form.notes}
                 onChange={(e) => setForm((p) => ({ ...p, notes: e.target.value }))}
-                rows={2}
-                className="w-full px-3 py-2.5 text-sm rounded-2xl border border-brand-primary/100 resize-none focus:outline-none focus:ring-2 focus:ring-pink-300 bg-white placeholder:text-gray-300"
+                rows={3}
+                className="w-full px-6 py-4 text-sm font-bold rounded-2xl border border-white/10 bg-white/5 text-white resize-none focus:outline-none focus:border-brand-primary/50 transition-all placeholder:text-slate-700"
               />
             </div>
 
           </div>
 
           {/* Footer */}
-          <div className="flex-shrink-0 flex gap-3 px-6 py-4 border-t border-brand-primary/50">
-            <Button variant="outline" onClick={onClose} className="flex-1 rounded-full border-brand-primary/100">
-              Cancelar
+          <div className="p-8 border-t border-white/5 flex gap-4 bg-white/[0.01]">
+            <Button variant="outline" onClick={onClose} className="flex-1 rounded-2xl h-16 border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:bg-white/5 hover:text-white">
+              Cerrar
             </Button>
             <Button
               onClick={handleUpload}
               disabled={!preview || isUploading}
-              className="flex-1 bg-brand-primary hover:bg-brand-primary/90 text-white rounded-full shadow-lg shadow-brand-primary/20 transition-all active:scale-95"
+              className="flex-1 bg-brand-primary hover:bg-brand-primary/90 text-white rounded-2xl h-16 shadow-xl shadow-brand-primary/20 transition-all font-black uppercase text-[10px] tracking-widest"
             >
               {isUploading ? (
-                <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Subiendo...</>
+                <><Loader2 className="w-5 h-5 mr-3 animate-spin" />Subiendo...</>
               ) : (
-                "Guardar foto"
+                "Guardar Archivo"
               )}
             </Button>
           </div>
 
-        </div>
-      </div>
-    </>
+        </motion.div>
+    </div>
   );
 }
 
@@ -735,11 +740,11 @@ function FilterChip({ active, onClick, children, small }: {
     <button
       onClick={onClick}
       className={cn(
-        "flex-shrink-0 font-bold border rounded-full transition-all whitespace-nowrap",
-        small ? "text-[10px] px-2.5 py-1" : "text-xs px-3 py-1.5",
+        "flex-shrink-0 font-black uppercase tracking-widest border rounded-xl transition-all whitespace-nowrap",
+        small ? "text-[8px] px-3 py-1.5" : "text-[10px] px-5 py-2.5",
         active
-          ? "bg-brand-primary text-white border-brand-primary shadow-lg shadow-brand-primary/20"
-          : "bg-white text-gray-500 border-gray-200 hover:border-brand-primary/20 hover:bg-brand-primary/5"
+          ? "bg-brand-primary text-white border-brand-primary shadow-xl shadow-brand-primary/20"
+          : "bg-white/5 text-slate-500 border-white/5 hover:border-white/20 hover:text-white"
       )}
     >
       {children}
@@ -749,18 +754,20 @@ function FilterChip({ active, onClick, children, small }: {
 
 function EmptyPhotos({ hasAny }: { hasAny: boolean }) {
   return (
-    <div className="flex flex-col items-center justify-center py-12 gap-3 text-center">
-      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
-        <ImageIcon className="w-8 h-8 text-gray-300" />
+    <div className="flex flex-col items-center justify-center py-24 gap-6 text-center">
+      <div className="w-20 h-20 bg-white/5 rounded-[2rem] flex items-center justify-center border border-white/10">
+        <ImageIcon className="w-10 h-10 text-slate-800" />
       </div>
-      <p className="font-bold text-gray-500">
-        {hasAny ? "Sin fotos con ese filtro" : "Sin fotos registradas"}
-      </p>
-      <p className="text-sm text-gray-400 max-w-xs">
-        {hasAny
-          ? "Prueba cambiando el filtro."
-          : "Agrega assets o versiones para hacer seguimiento visual del proyecto."}
-      </p>
+      <div className="space-y-1">
+        <p className="font-black text-white uppercase tracking-widest text-sm">
+            {hasAny ? "Sin resultados" : "Galería Vacía"}
+        </p>
+        <p className="text-xs text-slate-500 max-w-xs font-medium leading-relaxed">
+            {hasAny
+            ? "No se han encontrado archivos que coincidan con los filtros seleccionados."
+            : "Comienza a subir bocetos, capturas o entregables finales para llevar el control visual de este proyecto."}
+        </p>
+      </div>
     </div>
   );
 }

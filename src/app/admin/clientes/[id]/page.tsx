@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { ArrowLeft, User, ClipboardList, ImageIcon, Activity, Loader2, AlertTriangle, Plus, FileText, Code, Target } from "lucide-react";
+import { ArrowLeft, User, ClipboardList, ImageIcon, Activity, Loader2, AlertTriangle, Plus, FileText, Code } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 // Actions
 import { getClienteByIdAction } from "@/app/actions/clientes";
@@ -28,11 +29,11 @@ import { ModalNuevoSprintLog } from "@/components/cliente/ModalNuevoSprintLog";
 type TabId = "resumen" | "descubrimiento" | "historial" | "fotos" | "planes";
 
 const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
-  { id: "resumen", label: "Resumen", icon: User },
-  { id: "descubrimiento", label: "Descubrimiento", icon: Code },
-  { id: "historial", label: "Sprint Logs", icon: ClipboardList },
-  { id: "fotos", label: "Media", icon: ImageIcon },
-  { id: "planes", label: "Project Roadmap", icon: Activity },
+  { id: "resumen", label: "Perfil", icon: User },
+  { id: "descubrimiento", label: "Análisis", icon: Code },
+  { id: "historial", label: "Bitácora", icon: ClipboardList },
+  { id: "fotos", label: "Galería", icon: ImageIcon },
+  { id: "planes", label: "Hoja de Ruta", icon: Activity },
 ];
 
 export default function ClienteDetailPage() {
@@ -87,7 +88,7 @@ export default function ClienteDetailPage() {
     return (
       <div className="h-[60vh] flex flex-col items-center justify-center gap-6">
         <Loader2 className="w-12 h-12 text-brand-primary animate-spin" />
-        <p className="text-brand-primary font-black animate-pulse uppercase tracking-[0.2em] text-xs">Abriendo Roadmap...</p>
+        <p className="text-brand-primary font-black animate-pulse uppercase tracking-[0.2em] text-[10px]">Sincronizando Expediente...</p>
       </div>
     );
   }
@@ -96,10 +97,10 @@ export default function ClienteDetailPage() {
   if (!cliente) {
     return (
       <div className="h-[60vh] flex flex-col items-center justify-center gap-6">
-        <AlertTriangle className="w-16 h-16 text-amber-300" />
-        <h2 className="text-2xl font-black text-gray-800">Cliente no encontrado</h2>
+        <AlertTriangle className="w-16 h-16 text-rose-500" />
+        <h2 className="text-2xl font-black text-white">Registro no encontrado</h2>
         <Link href="/admin/clientes">
-          <Button variant="outline" className="rounded-2xl border-brand-primary text-brand-primary">Volver a la lista</Button>
+          <Button variant="outline" className="rounded-2xl border-white/10 bg-white/5 text-slate-300 hover:text-white">Volver a Clientes</Button>
         </Link>
       </div>
     );
@@ -112,34 +113,37 @@ export default function ClienteDetailPage() {
 
   // ── Render ──
   return (
-    <div className="pb-24 max-w-[1600px] mx-auto px-4 lg:px-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="pb-24 max-w-[1600px] mx-auto px-4 lg:px-8">
 
       {/* ── 1. HEADER & TOP ACTIONS ── */}
-      <div className="flex flex-col lg:flex-row items-center justify-between gap-8 mb-10 border-b border-brand-primary/20 pb-10">
+      <div className="flex flex-col lg:flex-row items-center justify-between gap-8 mb-10 border-b border-white/5 pb-10">
         <div className="flex items-center gap-6 w-full lg:w-auto">
           <Link href="/admin/clientes">
             <Button
               variant="ghost"
               size="icon"
-              className="w-12 h-12 rounded-2xl hover:bg-brand-primary/10 text-brand-primary transition-all border border-gray-100"
+              className="w-12 h-12 rounded-2xl hover:bg-white/5 text-slate-400 hover:text-white transition-all border border-white/5"
             >
               <ArrowLeft className="w-6 h-6" />
             </Button>
           </Link>
 
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-[1.5rem] bg-brand-primary/5 border-2 border-white shadow-md flex items-center justify-center text-brand-primary font-black text-2xl">
+            <div className="w-16 h-16 rounded-[1.5rem] bg-gradient-to-br from-brand-primary/20 to-blue-500/10 border border-white/10 flex items-center justify-center text-brand-primary font-black text-2xl shadow-xl shadow-brand-primary/5">
               {cliente.first_name?.[0]}{cliente.last_name?.[0]}
             </div>
             <div className="space-y-1">
-              <h1 className="text-3xl font-black text-gray-900 tracking-tight leading-none">
+              <h1 className="text-3xl font-black text-white tracking-tight leading-none font-heading">
                 {cliente.first_name} {cliente.last_name}
               </h1>
               <div className="flex items-center gap-3 flex-wrap">
-                <span className="text-[10px] font-black text-brand-primary uppercase tracking-widest bg-brand-primary/10 px-2 py-0.5 rounded-lg border border-brand-primary/20">
-                  ID · {cliente.id_number}
+                <span className="text-[10px] font-black text-brand-primary uppercase tracking-widest bg-brand-primary/10 px-2.5 py-1 rounded-lg border border-brand-primary/20">
+                  EXP · {cliente.id_number}
                 </span>
-                <span className="text-xs text-brand-secondary font-bold">● Activo</span>
+                <span className="flex items-center gap-1.5 text-[10px] text-emerald-400 font-black uppercase tracking-widest bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    ACTIVO
+                </span>
               </div>
             </div>
           </div>
@@ -149,23 +153,23 @@ export default function ClienteDetailPage() {
           <Button
             variant="outline"
             onClick={() => window.print()}
-            className="flex-1 lg:flex-none h-12 px-6 rounded-2xl border-gray-200 text-gray-600 hover:bg-brand-primary/5 font-bold transition-all"
+            className="flex-1 lg:flex-none h-14 px-8 rounded-2xl border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 font-black uppercase tracking-widest text-[10px] transition-all"
           >
             <FileText className="w-4 h-4 mr-2" />
-            Exportar Info
+            Resumen PDF
           </Button>
           <Button
             onClick={() => setShowNuevaVisita(true)}
-            className="flex-1 lg:flex-none bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-2xl font-black text-sm uppercase tracking-wider transition-all active:scale-95 border-none shadow-lg shadow-emerald-100"
+            className="flex-1 lg:flex-none bg-brand-primary hover:bg-brand-primary/90 text-white h-14 px-10 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all active:scale-95 border-none shadow-xl shadow-brand-primary/20"
           >
             <Plus className="w-5 h-5 mr-3" />
-            Registrar Log
+            Registrar Avance
           </Button>
         </div>
       </div>
 
       {/* ── 2. PREMIUM TAB NAVIGATION ── */}
-      <div className="bg-white/60 backdrop-blur-md p-1.5 rounded-[1.8rem] border border-gray-100 shadow-xl mb-10 sticky top-6 z-30 flex flex-wrap lg:flex-nowrap gap-1">
+      <div className="glass-card p-2 rounded-[2rem] border-white/5 shadow-2xl mb-12 sticky top-6 z-30 flex flex-wrap lg:flex-nowrap gap-1">
         {TABS.map(({ id: tabId, label, icon: Icon }) => {
           const isActive = activeTab === tabId;
           const count =
@@ -179,10 +183,10 @@ export default function ClienteDetailPage() {
               key={tabId}
               onClick={() => setActiveTab(tabId)}
               className={cn(
-                "flex-1 flex items-center justify-center gap-3 py-3.5 px-4 rounded-[1.2rem] text-[10px] font-black uppercase tracking-widest transition-all",
+                "flex-1 flex items-center justify-center gap-3 py-4 px-6 rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest transition-all",
                 isActive
-                  ? "bg-brand-primary text-white shadow-lg shadow-brand-primary/20"
-                  : "text-gray-600 hover:text-brand-primary hover:bg-white/80"
+                  ? "bg-brand-primary text-white shadow-xl shadow-brand-primary/20"
+                  : "text-slate-500 hover:text-white hover:bg-white/5"
               )}
             >
               <Icon className={cn("w-4 h-4", isActive ? "text-white" : "text-brand-primary/40")} />
@@ -202,41 +206,51 @@ export default function ClienteDetailPage() {
 
       {/* ── 3. CONTENT AREA ── */}
       <div className="animate-in fade-in zoom-in-95 duration-500">
-        {activeTab === "resumen" && (
-          <TabResumen
-            patient={cliente}
-            activePlan={activePlan}
-            lastVisit={lastVisit}
-            totalSessions={completedSessions}
-          />
-        )}
-        {activeTab === "descubrimiento" && (
-          <TabExpediente patient={cliente} />
-        )}
-        {activeTab === "historial" && (
-          <TabHistorial visits={visits} />
-        )}
-        {activeTab === "fotos" && (
-          <TabFotos
-            patientId={id}
-            photos={photos}
-            onRefresh={refreshPhotos}
-          />
-        )}
-        {activeTab === "planes" && (
-          <TabPlanes
-            patientId={id}
-            plans={plans}
-            onRefresh={refreshPlans}
-          />
-        )}
+        <AnimatePresence mode="wait">
+            <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+            >
+                {activeTab === "resumen" && (
+                <TabResumen
+                    patient={cliente}
+                    activePlan={activePlan}
+                    lastVisit={lastVisit}
+                    totalSessions={completedSessions}
+                />
+                )}
+                {activeTab === "descubrimiento" && (
+                <TabExpediente patient={cliente} />
+                )}
+                {activeTab === "historial" && (
+                <TabHistorial visits={visits} />
+                )}
+                {activeTab === "fotos" && (
+                <TabFotos
+                    patientId={id}
+                    photos={photos}
+                    onRefresh={refreshPhotos}
+                />
+                )}
+                {activeTab === "planes" && (
+                <TabPlanes
+                    patientId={id}
+                    plans={plans}
+                    onRefresh={refreshPlans}
+                />
+                )}
+            </motion.div>
+        </AnimatePresence>
       </div>
 
       {/* ── MODALS & FAB ── */}
       <div className="fixed bottom-24 right-6 md:hidden z-40">
         <Button
           onClick={() => setShowNuevaVisita(true)}
-          className="w-16 h-16 rounded-[1.8rem] bg-emerald-500 hover:bg-emerald-600 text-white transition-all active:scale-90 p-0 shadow-2xl shadow-emerald-200"
+          className="w-16 h-16 rounded-[1.8rem] bg-brand-primary hover:bg-brand-primary/90 text-white transition-all active:scale-90 p-0 shadow-2xl shadow-brand-primary/20"
         >
           <Plus className="w-8 h-8" />
         </Button>

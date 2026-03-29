@@ -40,8 +40,6 @@ export default function Wizard() {
             personal: {
                 firstName: "",
                 lastName: "",
-                age: "",
-                idNumber: "",
                 phone: "",
                 address: "",
                 email: "",
@@ -93,10 +91,8 @@ export default function Wizard() {
     const fillDemoData = () => {
         methods.setValue("personal.firstName", "Waiharrington");
         methods.setValue("personal.lastName", "Studio");
-        methods.setValue("personal.age", "25");
-        methods.setValue("personal.idNumber", "V-SOMOSDOS");
         methods.setValue("personal.phone", "+58 412 0000000");
-        methods.setValue("personal.address", "Somos Dos Studio, Caracas");
+        methods.setValue("personal.address", "Caracas, Las Mercedes");
         methods.setValue("personal.email", "info@somosdostudio.com");
 
         methods.setValue("discovery.hasExistingCode", true);
@@ -233,7 +229,7 @@ export default function Wizard() {
 
             <FormProvider {...methods}>
                 <form onSubmit={methods.handleSubmit(onSubmit as any)} className="space-y-8">
-                    <div className="bg-white/80 backdrop-blur-xl border border-white/40 shadow-xl rounded-3xl p-6 md:p-10 min-h-[400px] relative overflow-hidden">
+                    <div className="bg-slate-900/60 backdrop-blur-xl border border-white/10 shadow-[0_0_40px_-10px_rgba(0,0,0,0.5)] rounded-3xl p-6 md:p-10 min-h-[400px] relative overflow-hidden text-gray-100">
                         <button
                             type="button"
                             onClick={fillDemoData}
@@ -258,8 +254,8 @@ export default function Wizard() {
                                         <h2 className="text-2xl font-bold text-brand-primary">
                                             {steps[currentStep].title}
                                         </h2>
-                                        <p className="text-gray-500 text-sm">
-                                            Ayúdanos a entender el alcance de tu proyecto.
+                                        <p className="text-gray-400 text-sm">
+                                            Ingresa los datos del cliente para iniciar su perfil digital.
                                         </p>
                                     </div>
                                     {React.createElement(steps[currentStep].component)}

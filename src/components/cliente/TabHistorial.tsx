@@ -4,7 +4,6 @@ import { useState } from "react";
 import { ChevronDown, ChevronUp, Calendar, Zap, ClipboardList, AlertCircle, CheckCircle2, XCircle, RefreshCw, Terminal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { ModalNuevoSprintLog } from "./ModalNuevoSprintLog";
 import { es } from "date-fns/locale";
 
 // ─────────────────────────────────────────────
@@ -45,11 +44,11 @@ type Props = {
 // HELPERS
 // ─────────────────────────────────────────────
 
-const STATUS_CONFIG: Record<string, { label: string; icon: React.ReactNode; bg: string; text: string; dot: string }> = {
-  completed:   { label: "Finalizado",  icon: <CheckCircle2 className="w-3.5 h-3.5" />, bg: "bg-emerald-50 border-emerald-100",  text: "text-emerald-700", dot: "bg-emerald-500" },
-  cancelled:   { label: "Cancelado",   icon: <XCircle className="w-3.5 h-3.5" />,      bg: "bg-red-50 border-red-100",     text: "text-red-700",   dot: "bg-red-500" },
-  no_show:     { label: "Postpuesto",  icon: <AlertCircle className="w-3.5 h-3.5" />,  bg: "bg-amber-50 border-amber-100", text: "text-amber-700", dot: "bg-amber-500" },
-  rescheduled: { label: "Reagendado",  icon: <RefreshCw className="w-3.5 h-3.5" />,    bg: "bg-blue-50 border-blue-100",   text: "text-blue-700",  dot: "bg-blue-500" },
+const STATUS_CONFIG: Record<string, { label: string; icon: React.ElementType; bg: string; text: string; dot: string }> = {
+  completed:   { label: "Finalizado",  icon: CheckCircle2, bg: "bg-emerald-500/10 border-emerald-500/20",  text: "text-emerald-400", dot: "bg-emerald-500" },
+  cancelled:   { label: "Cancelado",   icon: XCircle,      bg: "bg-rose-500/10 border-rose-500/20",     text: "text-rose-400",   dot: "bg-rose-500" },
+  no_show:     { label: "Postpuesto",  icon: AlertCircle,  bg: "bg-amber-500/10 border-amber-500/20", text: "text-amber-400", dot: "bg-amber-500" },
+  rescheduled: { label: "Reagendado",  icon: RefreshCw,    bg: "bg-blue-500/10 border-blue-500/20",   text: "text-blue-400",  dot: "bg-blue-500" },
 };
 
 // ─────────────────────────────────────────────
@@ -61,26 +60,30 @@ export function TabHistorial({ visits }: Props) {
 
   if (visits.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
-        <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center">
-          <Terminal className="w-8 h-8 text-gray-300" />
+      <div className="flex flex-col items-center justify-center py-24 gap-6 text-center animate-in fade-in duration-700">
+        <div className="w-20 h-20 bg-white/5 rounded-[2rem] flex items-center justify-center border border-white/10 group hover:scale-110 transition-transform">
+          <Terminal className="w-10 h-10 text-slate-700 group-hover:text-brand-primary transition-colors" />
         </div>
-        <p className="font-bold text-gray-500">Sin logs de sprint registrados</p>
-        <p className="text-sm text-gray-400 max-w-xs">
-          Registra la primera interacción del proyecto para comenzar el historial.
-        </p>
+        <div className="space-y-1">
+            <p className="font-black text-white uppercase tracking-widest text-sm">Sin logs registrados</p>
+            <p className="text-xs text-slate-500 max-w-xs font-medium leading-relaxed">
+            Registra la primera interacción del proyecto para comenzar el historial de desarrollo.
+            </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="relative space-y-0">
+    <div className="relative space-y-0 animate-in fade-in duration-700">
       {/* Línea de tiempo vertical */}
-      <div className="absolute left-[19px] top-6 bottom-6 w-0.5 bg-gradient-to-b from-brand-primary/20 via-brand-primary/5 to-transparent z-0" />
+      <div className="absolute left-[23px] top-8 bottom-8 w-0.5 bg-gradient-to-b from-brand-primary/40 via-brand-primary/5 to-transparent z-0" />
 
       {visits.map((visit, index) => {
         const isExpanded = expandedId === visit.id;
-        const status = STATUS_CONFIG[visit.status] ?? STATUS_CONFIG.completed;
+        const config = STATUS_CONFIG[visit.status] ?? STATUS_CONFIG.completed;
+        const StatusIcon = config.icon;
+        
         const formattedDate = format(
           new Date(visit.visit_date + "T12:00:00"),
           "d MMM yyyy",
@@ -97,52 +100,55 @@ export function TabHistorial({ visits }: Props) {
         );
 
         return (
-          <div key={visit.id} className="relative flex gap-4 pb-5 z-10">
+          <div key={visit.id} className="relative flex gap-6 pb-6 z-10 group">
 
             {/* Punto de la línea de tiempo */}
             <div className="flex-shrink-0 mt-4">
               <div className={cn(
-                "w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-black shadow-sm",
-                visit.status === "completed"   ? "bg-brand-primary"  :
-                visit.status === "cancelled"   ? "bg-red-400"    :
-                visit.status === "no_show"    ? "bg-amber-400"  :
-                "bg-blue-400"
+                "w-12 h-12 rounded-2xl flex items-center justify-center text-white text-xs font-black shadow-lg transition-transform group-hover:scale-110",
+                visit.status === "completed"   ? "bg-brand-primary shadow-brand-primary/20"  :
+                visit.status === "cancelled"   ? "bg-rose-500 shadow-rose-500/20"    :
+                visit.status === "no_show"     ? "bg-amber-500 shadow-amber-500/20"  :
+                "bg-blue-500 shadow-blue-500/20"
               )}>
                 {visit.session_number}
               </div>
             </div>
 
             {/* Tarjeta de la visita */}
-            <div className="flex-1 bg-white rounded-[1.5rem] border border-gray-100 shadow-sm overflow-hidden">
+            <div className={cn(
+                "flex-1 glass-card border-white/5 overflow-hidden transition-all duration-300",
+                isExpanded ? "border-brand-primary/30 shadow-xl shadow-brand-primary/5" : "hover:border-white/10"
+            )}>
 
               {/* Header de la tarjeta */}
               <button
-                className="w-full text-left p-4 hover:bg-gray-50/50 transition-colors"
+                className="w-full text-left p-6 hover:bg-white/[0.02] transition-colors"
                 onClick={() => setExpandedId(isExpanded ? null : visit.id)}
               >
-                <div className="flex items-start justify-between gap-2">
+                <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-gray-800 text-sm leading-snug line-clamp-2">
+                    <p className="font-black text-white text-base tracking-tight leading-snug font-heading group-hover:text-brand-primary transition-colors">
                       {visit.treatment_applied}
                     </p>
-                    <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                      <span className="flex items-center gap-1 text-xs text-gray-400 font-medium">
-                        <Calendar className="w-3 h-3" />
+                    <div className="flex items-center gap-3 mt-3 flex-wrap">
+                      <span className="flex items-center gap-1.5 text-[10px] text-slate-500 font-black uppercase tracking-widest bg-white/5 px-2.5 py-1 rounded-lg border border-white/5">
+                        <Calendar className="w-3.5 h-3.5" />
                         {formattedDate}
                       </span>
 
                       {/* Badge de estado */}
                       <span className={cn(
-                        "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border",
-                        status.bg, status.text
+                        "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border",
+                        config.bg, config.text
                       )}>
-                        {status.icon}
-                        {status.label}
+                        <StatusIcon className="w-3.5 h-3.5" />
+                        {config.label}
                       </span>
 
                       {/* Roadmap vinculado */}
                       {visit.treatment_plans && (
-                        <span className="text-[10px] font-semibold text-brand-primary bg-brand-primary/10 px-2 py-0.5 rounded-full border border-brand-primary/20">
+                        <span className="text-[10px] font-black text-brand-primary bg-brand-primary/10 px-2.5 py-1 rounded-lg border border-brand-primary/20 uppercase tracking-widest">
                           {visit.treatment_plans.treatment_name}
                         </span>
                       )}
@@ -150,15 +156,15 @@ export function TabHistorial({ visits }: Props) {
                   </div>
 
                   {hasDetails && (
-                    <div className="flex-shrink-0 text-gray-300 mt-0.5">
-                      {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    <div className="flex-shrink-0 text-slate-700 mt-1">
+                      {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                     </div>
                   )}
                 </div>
 
                 {/* Preview de notas */}
                 {!isExpanded && visit.clinical_notes && (
-                  <p className="text-xs text-gray-500 mt-2 line-clamp-1 italic">
+                  <p className="text-xs text-slate-500 mt-4 line-clamp-1 italic bg-white/5 p-3 rounded-xl border border-white/5">
                     "{visit.clinical_notes}"
                   </p>
                 )}
@@ -166,22 +172,22 @@ export function TabHistorial({ visits }: Props) {
 
               {/* Detalle expandido */}
               {isExpanded && hasDetails && (
-                <div className="border-t border-gray-100 px-4 pb-4 pt-3 space-y-4">
+                <div className="border-t border-white/5 p-6 space-y-6 bg-white/[0.01]">
 
                   {/* Notas del Sprint */}
                   {visit.clinical_notes && (
                     <DetailSection
-                      icon={<ClipboardList className="w-3.5 h-3.5" />}
-                      label="Notas del Sprint"
+                      icon={<ClipboardList className="w-4 h-4" />}
+                      label="Registro de Avances"
                     >
-                      <p className="text-sm text-gray-700 leading-relaxed">{visit.clinical_notes}</p>
+                      <p className="text-sm text-slate-300 leading-relaxed">{visit.clinical_notes}</p>
                     </DetailSection>
                   )}
 
                   {/* Feedback del Cliente */}
                   {visit.patient_complaints && (
                     <DetailSection label="Feedback del Cliente">
-                      <p className="text-sm text-gray-700 bg-gray-50 p-2.5 rounded-xl border border-gray-100">
+                      <p className="text-sm text-slate-200 bg-white/5 p-4 rounded-xl border border-white/5 leading-relaxed">
                         {visit.patient_complaints}
                       </p>
                     </DetailSection>
@@ -189,8 +195,8 @@ export function TabHistorial({ visits }: Props) {
 
                   {/* Bloqueos o Issues */}
                   {visit.reaction_notes && (
-                    <DetailSection label="Inconvenientes / Bloqueos">
-                      <p className="text-sm text-red-700 bg-red-50 p-2.5 rounded-xl border border-red-100">
+                    <DetailSection label="Alertas / Bloqueos">
+                      <p className="text-sm text-rose-400 bg-rose-500/10 p-4 rounded-xl border border-rose-500/20 font-medium">
                         {visit.reaction_notes}
                       </p>
                     </DetailSection>
@@ -199,15 +205,15 @@ export function TabHistorial({ visits }: Props) {
                   {/* Log Técnico */}
                   {visit.equipment_params && Object.keys(visit.equipment_params).length > 0 && (
                     <DetailSection
-                      icon={<Zap className="w-3.5 h-3.5" />}
-                      label="Log Técnico / Entorno"
+                      icon={<Zap className="w-4 h-4" />}
+                      label="Especificaciones Técnicas"
                     >
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {Object.entries(visit.equipment_params).map(([key, val]) =>
                           val ? (
-                            <div key={key} className="bg-gray-50 px-3 py-2 rounded-xl">
-                              <p className="text-[10px] font-bold text-gray-400 uppercase">{key}</p>
-                              <p className="text-sm font-semibold text-gray-700">{val}</p>
+                            <div key={key} className="bg-white/5 px-4 py-3 rounded-xl border border-white/5 transition-all hover:bg-white/10">
+                              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{key}</p>
+                              <p className="text-sm font-bold text-slate-200 mt-1">{val}</p>
                             </div>
                           ) : null
                         )}
@@ -217,11 +223,13 @@ export function TabHistorial({ visits }: Props) {
 
                   {/* Próximo Check-in */}
                   {visit.next_visit_date && (
-                    <div className="flex items-center gap-2 pt-1">
-                      <Calendar className="w-4 h-4 text-brand-primary" />
-                      <p className="text-sm font-semibold text-gray-600">
+                    <div className="flex items-center gap-3 pt-4 border-t border-white/5">
+                      <div className="p-2 bg-brand-primary/10 rounded-lg text-brand-primary">
+                        <Calendar className="w-4 h-4" />
+                      </div>
+                      <p className="text-xs font-black text-slate-400 uppercase tracking-widest">
                         Próximo Check-in:{" "}
-                        <span className="text-brand-primary">
+                        <span className="text-white ml-2 px-3 py-1 bg-brand-primary/20 rounded-lg border border-brand-primary/30">
                           {format(new Date(visit.next_visit_date + "T12:00:00"), "d 'de' MMMM yyyy", { locale: es })}
                         </span>
                       </p>
@@ -249,13 +257,12 @@ function DetailSection({
   children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-1.5">
-      <div className="flex items-center gap-1.5">
-        {icon && <span className="text-brand-primary/40">{icon}</span>}
-        <p className="text-[10px] font-black text-brand-primary/40 uppercase tracking-widest">{label}</p>
+    <div className="space-y-3">
+      <div className="flex items-center gap-2">
+        {icon && <span className="text-brand-primary/60">{icon}</span>}
+        <p className="text-[10px] font-black text-brand-primary uppercase tracking-[0.2em]">{label}</p>
       </div>
       {children}
     </div>
   );
 }
-

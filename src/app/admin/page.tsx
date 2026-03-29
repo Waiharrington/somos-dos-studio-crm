@@ -103,16 +103,16 @@ export default function AdminDashboard() {
                     <WidgetRecordatorios />
                     
                     {/* Bonus Card: Inventario o Stock */}
-                    <div className="glass-card p-8 bg-brand-primary-soft border border-brand-primary/100/50 relative overflow-hidden group">
+                    <div className="glass-card p-8 border border-white/10 relative overflow-hidden group">
                         <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform">
                             <Plus className="w-20 h-20 text-brand-primary" />
                         </div>
-                        <h4 className="font-black text-xl text-gray-900 mb-2">Suministros</h4>
-                        <p className="text-gray-500 text-xs mb-6 font-medium leading-relaxed">
-                            Controla tu stock de botox y rellenos para que nunca te falte nada.
+                        <h4 className="font-black text-xl text-white mb-2">Suministros e Inventario</h4>
+                        <p className="text-slate-400 text-xs mb-6 font-medium leading-relaxed">
+                            Controla tu stock de productos y equipos para que nunca te falte nada en el estudio.
                         </p>
                         <Link href="/admin/inventario">
-                            <Button className="w-full bg-white text-brand-primary hover:bg-brand-primary/50 rounded-2xl font-bold border border-brand-primary/100 shadow-sm transition-all hover:shadow-md">
+                            <Button className="w-full bg-brand-primary hover:bg-brand-primary/90 text-white rounded-2xl h-14 font-black uppercase tracking-widest text-[10px] border-none shadow-xl shadow-brand-primary/20 transition-all hover:-translate-y-1 active:scale-95">
                                 Gestionar Inventario
                             </Button>
                         </Link>

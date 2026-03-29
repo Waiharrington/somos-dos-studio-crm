@@ -3,8 +3,6 @@ import { z } from "zod";
 export const personalDataSchema = z.object({
     firstName: z.string().min(2, "El nombre es muy corto"),
     lastName: z.string().min(2, "El apellido es muy corto"),
-    age: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Edad inválida"),
-    idNumber: z.string().min(5, "Cédula requerida"),
     phone: z.string().min(7, "Teléfono inválido"),
     address: z.string().min(5, "Dirección requerida"),
     email: z.string().email("Email inválido").optional().or(z.literal("")),

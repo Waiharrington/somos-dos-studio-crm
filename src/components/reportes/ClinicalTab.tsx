@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react";
 import {
     BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-    Cell, PieChart, Pie, Legend, RadialBarChart, RadialBar
+    Cell, PieChart, Pie, Legend
 } from "recharts";
-import { Activity, Wind, Sun, ShieldCheck, AlertCircle, Loader2 } from "lucide-react";
+import { Activity, Wind, Sun, ShieldCheck, AlertCircle, Loader2, Code2, Cpu, Globe, Lock } from "lucide-react";
 import { getClinicalReportDataAction } from "@/app/actions/reports_clinical_ops";
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
-const COLORS = ["#D685A9", "#B34D7F", "#9D4D76", "#E5BCd4", "#F2A8C4", "#7A3A5C"];
+const COLORS = ["#D685A9", "#6366f1", "#8b5cf6", "#ec4899", "#3b82f6", "#10b981"];
 
 export default function ClinicalTab() {
     const [data, setData] = useState<any>(null);
@@ -25,49 +27,54 @@ export default function ClinicalTab() {
 
     if (isLoading) {
         return (
-            <div className="flex flex-col items-center justify-center py-20 gap-3">
-                <Loader2 className="w-8 h-8 text-brand-primary/400 animate-spin" />
-                <p className="text-gray-400 text-sm font-medium">Analizando perfiles clínicos...</p>
+            <div className="flex flex-col items-center justify-center py-32 gap-6">
+                <Loader2 className="w-10 h-10 text-brand-primary animate-spin" />
+                <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] animate-pulse">Analizando Perfiles de Proyecto...</p>
             </div>
         );
     }
 
+    // Adaptamos las métricas clínicas a conceptos de "Somos Dos Studio"
     const habitData = [
-        { name: "Fumadores", value: data.lifestyle.smokes, fill: "#D685A9", icon: Wind },
-        { name: "Ejercicio", value: data.lifestyle.exercises, fill: "#B34D7F", icon: Activity },
-        { name: "Exp. Solar", value: data.lifestyle.sunExposure, fill: "#9D4D76", icon: Sun },
-        { name: "Protector", value: data.lifestyle.usesSunscreen, fill: "#E5BCd4", icon: ShieldCheck },
+        { name: "Alta Prioridad", value: data.lifestyle.smokes, fill: "#D685A9", icon: Activity },
+        { name: "Escalable", value: data.lifestyle.exercises, fill: "#6366f1", icon: Cpu },
+        { name: "Internacional", value: data.lifestyle.sunExposure, fill: "#8b5cf6", icon: Globe },
+        { name: "Documentado", value: data.lifestyle.usesSunscreen, fill: "#ec4899", icon: Lock },
     ];
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
 
-            {/* ── HABITS GRID ── */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* ── METRICAS DE PROYECTO ── */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                 {habitData.map((habit) => (
-                    <div key={habit.name} className="bg-white p-5 rounded-[2rem] border border-brand-primary/50 shadow-sm shadow-pink-100/50 flex flex-col items-center text-center gap-3">
-                        <div className="w-12 h-12 rounded-2xl bg-brand-primary/50 flex items-center justify-center">
-                            <habit.icon className="w-6 h-6 text-brand-primary" />
+                    <div key={habit.name} className="glass-card p-6 border-white/5 flex flex-col items-center text-center gap-4 hover:border-brand-primary/20 transition-all group">
+                        <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:scale-110 transition-transform">
+                            <habit.icon className="w-7 h-7 text-brand-primary shadow-glow" />
                         </div>
                         <div>
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{habit.name}</p>
-                            <p className="text-2xl font-black text-gray-800">{((habit.value / data.totalPatients) * 100).toFixed(0)}%</p>
-                            <p className="text-[10px] text-gray-400 font-medium">{habit.value} de {data.totalPatients} clientes</p>
+                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1">{habit.name}</p>
+                            <p className="text-3xl font-black text-white font-heading tracking-tighter">
+                                {data.totalPatients > 0 ? ((habit.value / data.totalPatients) * 100).toFixed(0) : 0}%
+                            </p>
+                            <p className="text-[10px] text-slate-600 font-bold uppercase tracking-widest mt-1">
+                                {habit.value} de {data.totalPatients} proyectos
+                            </p>
                         </div>
                     </div>
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
                 {/* Body Zones Distribution */}
-                <div className="bg-white p-6 rounded-[2.5rem] border border-brand-primary/50 shadow-sm shadow-pink-100/50">
-                    <div className="mb-6">
-                        <h3 className="font-black text-gray-800 text-lg">Zonas más Tratadas</h3>
-                        <p className="text-xs text-gray-400 font-medium">Distribución de frecuencias por zona corporal</p>
+                <div className="glass-card p-10 border-white/5 shadow-2xl">
+                    <div className="mb-10 space-y-2">
+                        <h3 className="font-black text-white text-xl font-heading tracking-tight">Componentes Frecuentes</h3>
+                        <p className="text-[10px] font-black text-brand-primary uppercase tracking-[0.2em]">Distribución de incidencia por módulo de desarrollo</p>
                     </div>
 
-                    <div className="h-[300px] w-full">
+                    <div className="h-[360px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
                                 <Pie
@@ -76,54 +83,55 @@ export default function ClinicalTab() {
                                     nameKey="name"
                                     cx="50%"
                                     cy="50%"
-                                    innerRadius={60}
-                                    outerRadius={100}
-                                    paddingAngle={5}
+                                    innerRadius={70}
+                                    outerRadius={110}
+                                    paddingAngle={6}
                                 >
                                     {data.bodyZones.map((_: any, index: number) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="rgba(255,255,255,0.2)" />
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="rgba(255,255,255,0.05)" strokeWidth={4} />
                                     ))}
                                 </Pie>
                                 <Tooltip
-                                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                                    contentStyle={{ backgroundColor: "#0f172a", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.1)", color: "white" }}
                                 />
-                                <Legend iconType="circle" wrapperStyle={{ fontSize: '11px', fontWeight: 600 }} />
+                                <Legend iconType="circle" align="right" verticalAlign="middle" layout="vertical" wrapperStyle={{ fontSize: '10px', fontWeight: "900", textTransform: "uppercase", letterSpacing: "0.1em", paddingLeft: "30px", color: "#64748b" }} />
                             </PieChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
 
                 {/* Clinical Alerts Summary */}
-                <div className="bg-white p-6 rounded-[2.5rem] border border-brand-primary/50 shadow-sm shadow-pink-100/50 flex flex-col">
-                    <div className="mb-6">
-                        <h3 className="font-black text-gray-800 text-lg">Alertas y Sensibilidades</h3>
-                        <p className="text-xs text-gray-400 font-medium">clientes que requieren atención especial</p>
+                <div className="glass-card p-10 border-white/5 shadow-2xl flex flex-col">
+                    <div className="mb-10 space-y-2">
+                        <h3 className="font-black text-white text-xl font-heading tracking-tight">Análisis de Riesgos</h3>
+                        <p className="text-[10px] font-black text-brand-primary uppercase tracking-[0.2em]">Proyectos con requerimientos de alta complejidad</p>
                     </div>
 
-                    <div className="flex-1 flex flex-col justify-center gap-6">
-                        <div className="flex items-center gap-6 p-6 rounded-3xl bg-red-50/50 border border-red-100">
-                            <div className="w-16 h-16 rounded-2xl bg-red-100 flex items-center justify-center">
-                                <AlertCircle className="w-10 h-10 text-red-500" />
+                    <div className="flex-1 flex flex-col justify-center gap-8">
+                        <div className="flex items-center gap-8 p-8 rounded-[2.5rem] bg-rose-500/10 border border-rose-500/20 group relative overflow-hidden transition-all hover:bg-rose-500/15">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/10 rounded-full blur-3xl -translate-y-16 translate-x-16" />
+                            <div className="w-20 h-20 rounded-[2rem] bg-rose-500/20 flex items-center justify-center flex-shrink-0 border border-rose-500/30 group-hover:scale-110 transition-transform">
+                                <AlertCircle className="w-10 h-10 text-rose-500" />
                             </div>
-                            <div>
-                                <p className="text-3xl font-black text-red-600">{data.lifestyle.allergies}</p>
-                                <p className="text-sm font-bold text-red-900/60 uppercase tracking-wide">clientes con Alergias</p>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="p-5 rounded-3xl bg-gray-50/80 border border-gray-100">
-                                <p className="text-xs font-bold text-gray-400 uppercase mb-1">Total Analizados</p>
-                                <p className="text-xl font-black text-gray-700">{data.totalPatients}</p>
-                            </div>
-                            <div className="p-5 rounded-3xl bg-brand-primary/50/80 border border-brand-primary/100">
-                                <p className="text-xs font-bold text-brand-primary/400 uppercase mb-1">Sin Alergias</p>
-                                <p className="text-xl font-black text-brand-primary/700">{data.totalPatients - data.lifestyle.allergies}</p>
+                            <div className="space-y-1">
+                                <p className="text-5xl font-black text-rose-400 font-heading tracking-tighter">{data.lifestyle.allergies}</p>
+                                <p className="text-[10px] font-black text-rose-500/60 uppercase tracking-[0.2em]">Puntos de Bloqueo / Riesgos</p>
                             </div>
                         </div>
 
-                        <p className="text-[11px] text-gray-400 text-center italic mt-4">
-                            * Estos datos ayudan a preparar los protocolos de seguridad antes de cada sesión.
+                        <div className="grid grid-cols-2 gap-6">
+                            <div className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 group hover:border-white/10 transition-all">
+                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Total Analizados</p>
+                                <p className="text-3xl font-black text-white font-heading tracking-tighter">{data.totalPatients}</p>
+                            </div>
+                            <div className="p-8 rounded-[2.5rem] bg-brand-primary/10 border border-brand-primary/20 group hover:border-brand-primary/30 transition-all">
+                                <p className="text-[10px] font-black text-brand-primary uppercase tracking-[0.2em] mb-3">Flujo Estándar</p>
+                                <p className="text-3xl font-black text-brand-primary font-heading tracking-tighter">{data.totalPatients - data.lifestyle.allergies}</p>
+                            </div>
+                        </div>
+
+                        <p className="text-[10px] text-slate-600 text-center italic mt-4 font-medium uppercase tracking-widest">
+                            * Proyecciones basadas en la bitácora técnica de Somos Dos Studio.
                         </p>
                     </div>
                 </div>

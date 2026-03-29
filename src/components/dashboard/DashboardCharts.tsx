@@ -26,7 +26,7 @@ export function DashboardCharts() {
   if (isLoading) {
     return (
       <div className="h-64 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-brand-primary/400 animate-spin" />
+        <Loader2 className="w-8 h-8 text-brand-primary/40 animate-spin" />
       </div>
     );
   }
@@ -50,11 +50,11 @@ export function DashboardCharts() {
       <div className="glass-card p-8 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-xl font-black text-gray-950">Composición</h4>
-            <p className="text-xs font-semibold text-gray-600">Distribución de servicios</p>
+            <h4 className="text-xl font-black text-white">Composición</h4>
+            <p className="text-xs font-semibold text-slate-400">Distribución de servicios</p>
           </div>
-          <button className="text-[10px] font-bold text-brand-primary bg-brand-primary/50 px-3 py-1.5 rounded-xl border border-brand-primary/100">
-            DETALLES
+          <button className="text-[10px] font-black tracking-widest text-brand-primary bg-brand-primary/10 px-3 py-1.5 rounded-xl border border-brand-primary/20 uppercase">
+            Detalles
           </button>
         </div>
 
@@ -64,7 +64,7 @@ export function DashboardCharts() {
             <circle
               cx="96" cy="96" r="80"
               fill="transparent"
-              stroke="#FDF2F8"
+              stroke="rgba(255,255,255,0.05)"
               strokeWidth="24"
             />
             <motion.circle
@@ -79,25 +79,25 @@ export function DashboardCharts() {
             />
             <defs>
               <linearGradient id="gradient-chart" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#B34D7F" />
-                <stop offset="100%" stopColor="#D685A9" />
+                <stop offset="0%" stopColor="#7427A5" />
+                <stop offset="100%" stopColor="#193BB3" />
               </linearGradient>
             </defs>
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-            <span className="text-3xl font-black text-gray-950">{facialPercentage}%</span>
-            <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest leading-tight">Limpieza / Hidratación</span>
+            <span className="text-4xl font-black text-white tracking-tighter">{facialPercentage}%</span>
+            <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest leading-tight">Faciales / Hidratación</span>
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4 pt-4">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-somos-dos-primary" />
-            <span className="text-[10px] font-bold text-gray-600 uppercase">Limpieza ({facialPercentage}%)</span>
+            <div className="w-3 h-3 rounded-full bg-brand-primary" />
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Faciales ({facialPercentage}%)</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-brand-primary/100" />
-            <span className="text-[10px] font-bold text-gray-600 uppercase">Corporal ({corporalPercentage}%)</span>
+            <div className="w-3 h-3 rounded-full bg-blue-500" />
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Corporales ({corporalPercentage}%)</span>
           </div>
         </div>
       </div>
@@ -106,8 +106,8 @@ export function DashboardCharts() {
       <div className="glass-card p-8 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-xl font-black text-gray-950">Evolución</h4>
-            <p className="text-xs font-semibold text-gray-600">clientes nuevos esta semana</p>
+            <h4 className="text-xl font-black text-white">Evolución</h4>
+            <p className="text-xs font-semibold text-slate-400">clientes nuevos esta semana</p>
           </div>
         </div>
 
@@ -127,11 +127,11 @@ export function DashboardCharts() {
                     transition={{ delay: i * 0.1, duration: 0.8 }}
                     className={cn(
                       "w-full rounded-t-xl transition-all",
-                      count > 0 ? "bg-brand-primary shadow-lg shadow-pink-100" : "bg-gray-50 border border-gray-100"
+                      count > 0 ? "bg-brand-primary shadow-lg shadow-brand-primary/20" : "bg-white/5 border border-white/5"
                     )}
                   />
                 </div>
-                <span className="text-[9px] font-black text-gray-600 uppercase tracking-tighter">
+                <span className="text-[9px] font-black text-slate-500 uppercase tracking-tighter">
                   {['L', 'M', 'X', 'J', 'V', 'S', 'D'][i]}
                 </span>
               </div>

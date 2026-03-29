@@ -101,37 +101,40 @@ export function QuickBookingModal({ isOpen, onClose, onSuccess }: QuickBookingMo
       <motion.div 
         initial={{ scale: 0.9, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.9, opacity: 0, y: 20 }}
-        className="relative w-full max-w-lg bg-white rounded-[2rem] shadow-2xl border border-brand-primary/100 overflow-hidden"
+        className="relative w-full max-w-lg glass-card rounded-[2rem] shadow-3xl border border-white/10 overflow-hidden"
       >
+        <div className="absolute top-0 right-0 w-64 h-64 radial-glow-purple opacity-20 -translate-y-1/2 translate-x-1/2 blur-[80px]" />
+
         {/* Header */}
-        <div className="p-8 bg-brand-primary-soft border-b border-brand-primary/100 flex items-center justify-between">
+        <div className="p-8 bg-white/[0.01] border-b border-white/5 flex items-center justify-between relative z-10">
           <div>
-            <h3 className="text-xl font-black text-gray-900">Agendado Rápido</h3>
+            <h3 className="text-xl font-black text-white">Agendado Rápido</h3>
             <p className="text-[10px] font-bold text-brand-primary uppercase tracking-widest mt-1">Citas Directas</p>
           </div>
-          <button onClick={onClose} aria-label="Cerrar modal" className="p-2 hover:bg-white rounded-xl transition-colors">
-            <X className="w-5 h-5 text-gray-400" />
+          <button onClick={onClose} aria-label="Cerrar modal" className="p-2 hover:bg-white/5 text-slate-400 hover:text-white rounded-xl transition-colors">
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Mode Selector */}
-        <div className="p-2 bg-gray-50 flex gap-2 mx-8 mt-6 rounded-2xl border border-gray-100">
+        <div className="p-2 bg-white/5 flex gap-2 mx-8 mt-6 rounded-2xl border border-white/10 relative z-10">
           <button 
+            type="button"
             onClick={() => setMode("recurring")}
             className={cn(
               "flex-1 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all gap-2 flex items-center justify-center",
-              mode === "recurring" ? "bg-white text-brand-primary shadow-sm" : "text-gray-400 hover:text-gray-600"
+              mode === "recurring" ? "bg-brand-primary text-white shadow-lg shadow-brand-primary/20" : "text-slate-500 hover:text-white"
             )}
           >
             <Search className="w-3.5 h-3.5" />
             Recurrente
           </button>
           <button 
+            type="button"
             onClick={() => setMode("new")}
             className={cn(
               "flex-1 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all gap-2 flex items-center justify-center",
-              mode === "new" ? "bg-white text-brand-primary shadow-sm" : "text-gray-400 hover:text-gray-600"
+              mode === "new" ? "bg-brand-primary text-white shadow-lg shadow-brand-primary/20" : "text-slate-500 hover:text-white"
             )}
           >
             <UserPlus className="w-3.5 h-3.5" />
@@ -139,7 +142,7 @@ export function QuickBookingModal({ isOpen, onClose, onSuccess }: QuickBookingMo
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-8 space-y-6">
+        <form onSubmit={handleSubmit} className="p-8 space-y-6 relative z-10">
           <AnimatePresence mode="wait">
             {mode === "recurring" ? (
               <motion.div 
@@ -150,22 +153,22 @@ export function QuickBookingModal({ isOpen, onClose, onSuccess }: QuickBookingMo
                 className="space-y-4"
               >
                 <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Número de Cédula</Label>
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Número de Identificación</Label>
                   <div className="flex gap-2">
                     <div className="relative flex-1">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                       <Input 
                         value={idNumber}
                         onChange={(e) => setIdNumber(e.target.value)}
                         placeholder="V-12345678" 
-                        className="pl-10 h-12 rounded-xl bg-gray-50 border-gray-100 focus:bg-white transition-all"
+                        className="pl-10 h-12 rounded-xl bg-white/5 border-white/10 focus:border-brand-primary/50 text-white placeholder:text-slate-600 transition-all"
                       />
                     </div>
                     <Button 
                       type="button" 
                       onClick={handleSearch}
                       disabled={searchLoading || !idNumber}
-                      className="h-12 px-6 bg-gray-900 hover:bg-black text-white rounded-xl font-bold"
+                      className="h-12 px-6 bg-brand-primary/20 hover:bg-brand-primary text-brand-primary hover:text-white rounded-xl font-bold uppercase tracking-widest text-[10px] transition-all border border-brand-primary/30"
                     >
                       {searchLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Buscar"}
                     </Button>
@@ -176,12 +179,12 @@ export function QuickBookingModal({ isOpen, onClose, onSuccess }: QuickBookingMo
                   <motion.div 
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-4 bg-green-50 border border-green-100 rounded-2xl flex items-center gap-3"
+                    className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-center gap-3"
                   >
-                    <CheckCircle2 className="w-5 h-5 text-green-500" />
+                    <CheckCircle2 className="w-5 h-5 text-emerald-500" />
                     <div>
-                      <p className="text-xs font-black text-gray-900">{foundPatient.first_name} {foundPatient.last_name}</p>
-                      <p className="text-[10px] font-medium text-green-600">{foundPatient.phone}</p>
+                      <p className="text-xs font-black text-white">{foundPatient.first_name} {foundPatient.last_name}</p>
+                      <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">{foundPatient.phone}</p>
                     </div>
                   </motion.div>
                 )}
@@ -196,22 +199,22 @@ export function QuickBookingModal({ isOpen, onClose, onSuccess }: QuickBookingMo
               >
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Nombre del Invitado</Label>
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Nombre del Lead</Label>
                     <Input 
                       required
                       value={guestName}
                       onChange={(e) => setGuestName(e.target.value)}
                       placeholder="Nombre completo" 
-                      className="h-12 rounded-xl bg-gray-50 border-gray-100 focus:bg-white transition-all"
+                      className="h-12 rounded-xl bg-white/5 border-white/10 focus:border-brand-primary/50 text-white placeholder:text-slate-600 transition-all"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Teléfono (Opcional)</Label>
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Teléfono (Opcional)</Label>
                     <Input 
                       value={guestPhone}
                       onChange={(e) => setGuestPhone(e.target.value)}
-                      placeholder="0412-..." 
-                      className="h-12 rounded-xl bg-gray-50 border-gray-100 focus:bg-white transition-all"
+                      placeholder="+58 412..." 
+                      className="h-12 rounded-xl bg-white/5 border-white/10 focus:border-brand-primary/50 text-white placeholder:text-slate-600 transition-all"
                     />
                   </div>
                 </div>
@@ -221,45 +224,45 @@ export function QuickBookingModal({ isOpen, onClose, onSuccess }: QuickBookingMo
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Fecha</Label>
+              <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Fecha</Label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                 <Input 
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="pl-10 h-12 rounded-xl bg-gray-50 border-gray-100 focus:bg-white transition-all"
+                  className="pl-10 h-12 rounded-xl bg-white/5 border-white/10 focus:border-brand-primary/50 text-white transition-all [&::-webkit-calendar-picker-indicator]:invert"
                 />
               </div>
             </div>
             <div className="space-y-2">
-              <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Hora</Label>
+              <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Hora</Label>
               <div className="relative">
-                <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                 <Input 
                   type="time"
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
-                  className="pl-10 h-12 rounded-xl bg-gray-50 border-gray-100 focus:bg-white transition-all"
+                  className="pl-10 h-12 rounded-xl bg-white/5 border-white/10 focus:border-brand-primary/50 text-white transition-all [&::-webkit-calendar-picker-indicator]:invert"
                 />
               </div>
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">servicio</Label>
+            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Servicio / Hito</Label>
             <Input 
               value={treatment}
               onChange={(e) => setTreatment(e.target.value)}
-              placeholder="Ej: Botox, Limpieza facial..." 
-              className="h-12 rounded-xl bg-gray-50 border-gray-100 focus:bg-white transition-all"
+              placeholder="Ej: Revisión diseño web..." 
+              className="h-12 rounded-xl bg-white/5 border-white/10 focus:border-brand-primary/50 text-white placeholder:text-slate-600 transition-all"
             />
           </div>
 
           <Button 
             type="submit"
             disabled={isLoading || (mode === "recurring" && !foundPatient)}
-            className="w-full h-14 bg-brand-primary text-white rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-pink-200 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100"
+            className="w-full h-14 bg-brand-primary hover:bg-brand-primary/90 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-brand-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all border-none"
           >
             {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Agendar Cita Ahora"}
           </Button>

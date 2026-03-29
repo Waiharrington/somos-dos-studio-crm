@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { X, ChevronDown, ChevronUp, Loader2, Calendar, Code, Zap, ClipboardList, MessageSquare, Terminal } from "lucide-react";
+import { X, ChevronDown, ChevronUp, Loader2, Calendar, Code, Zap, ClipboardList, Terminal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { createVisitAction, type CreateVisitInput, type VisitStatus } from "@/app/actions/visits";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
 // ─────────────────────────────────────────────
 // COMPONENTES DEL PROYECTO
@@ -15,19 +16,19 @@ import { toast } from "sonner";
 const PROJECT_COMPONENTS = [
   {
     group: "Frontend",
-    zones: ["UI Components", "Landing Pages", "Dashboard", "Auth Flow", "Responsive Fixes", "Animations"],
+    zones: ["Componentes UI", "Páginas de Aterrizaje", "Panel de Control", "Flujo de Auth", "Ajustes Responsive", "Animaciones"],
   },
   {
     group: "Backend / API",
-    zones: ["Database Schema", "Server Actions", "Supabase Edge Functions", "Webhooks", "Internal Logic"],
+    zones: ["Esquema de Base de Datos", "Acciones del Servidor", "Funciones del Borde", "Webhooks", "Lógica Interna"],
   },
   {
     group: "Diseño & UX",
-    zones: ["Figma Mockups", "Brand Identity", "User Flow", "Design System"],
+    zones: ["Mockups en Figma", "Identidad de Marca", "Flujo de Usuario", "Sistema de Diseño"],
   },
   {
-    group: "DevOps & Misc",
-    zones: ["Deployment", "Performance", "Security", "Documentation", "Testing"],
+    group: "DevOps & Varios",
+    zones: ["Despliegue / Deploy", "Rendimiento", "Seguridad", "Documentación", "Pruebas / QA"],
   },
 ];
 
@@ -41,6 +42,7 @@ type Plan = {
   body_zone: string | null;
   total_sessions: number;
   completed_sessions: number;
+  status?: string;
 };
 
 type Props = {
@@ -78,12 +80,11 @@ export function ModalNuevoSprintLog({ patientId, plans, isOpen, onClose, onSucce
   const [form, setForm] = useState(EMPTY_FORM);
   const [isSaving, setIsSaving] = useState(false);
   const [showEquipment, setShowEquipment] = useState(false);
-  const [showReactions, setShowReactions] = useState(false);
   const [showZones, setShowZones] = useState(false);
 
   if (!isOpen) return null;
 
-  const set = (field: keyof typeof EMPTY_FORM, value: any) =>
+  const set = <K extends keyof typeof EMPTY_FORM>(field: K, value: (typeof EMPTY_FORM)[K]) =>
     setForm((prev) => ({ ...prev, [field]: value }));
 
   const toggleZone = (zone: string) => {
@@ -130,7 +131,7 @@ export function ModalNuevoSprintLog({ patientId, plans, isOpen, onClose, onSucce
     setIsSaving(false);
 
     if (result.success) {
-      toast.success("Sprint Log registrado correctamente.");
+      toast.success("Log de avance registrado correctamente.");
       setForm(EMPTY_FORM);
       onSuccess();
       onClose();
@@ -139,82 +140,85 @@ export function ModalNuevoSprintLog({ patientId, plans, isOpen, onClose, onSucce
     }
   };
 
-  const activePlans = plans.filter((p) => (p as any).status === "active");
+  const activePlans = plans.filter((p) => p.status === "active");
 
   return (
-    <>
-      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40" onClick={onClose} />
+    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-4">
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="absolute inset-0 bg-black/80 backdrop-blur-md" 
+        onClick={onClose} 
+      />
 
-      <div className="fixed inset-x-0 bottom-0 z-50 md:inset-0 md:flex md:items-center md:justify-center">
-        <div className="bg-white rounded-t-[2.5rem] md:rounded-[2.5rem] md:w-[640px] md:max-h-[90vh] w-full max-h-[92vh] flex flex-col shadow-2xl">
-
-          {/* Handle + Header */}
-          <div className="flex-shrink-0">
-            <div className="flex justify-center pt-3 pb-1 md:hidden">
-              <div className="w-10 h-1 rounded-full bg-gray-200" />
-            </div>
-
-            <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-brand-primary/10 rounded-xl text-brand-primary">
-                  <Terminal className="w-5 h-5" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-black text-gray-900 tracking-tight">Nuevo Sprint Log</h2>
-                  <p className="text-[10px] font-black text-brand-primary/40 uppercase tracking-widest mt-0.5">Registrar progreso sesión</p>
-                </div>
+      <motion.div 
+        initial={{ y: 100, opacity: 0, scale: 0.95 }}
+        animate={{ y: 0, opacity: 1, scale: 1 }}
+        exit={{ y: 100, opacity: 0, scale: 0.95 }}
+        className="relative glass-card w-full max-w-2xl max-h-[92vh] flex flex-col border-white/10 overflow-hidden shadow-3xl"
+      >
+          {/* Header */}
+          <div className="flex items-center justify-between p-8 border-b border-white/5 flex-shrink-0 bg-white/[0.01]">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-brand-primary/20 rounded-2xl text-brand-primary border border-brand-primary/30 shadow-xl shadow-brand-primary/10">
+                <Terminal className="w-6 h-6" />
               </div>
-              <button
-                onClick={onClose}
-                className="p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div>
+                <h2 className="text-2xl font-black text-white tracking-tight font-heading">Nuevo Registro de Avance</h2>
+                <p className="text-[10px] font-black text-brand-primary uppercase tracking-[0.2em] mt-1">Bitácora técnica de sesión</p>
+              </div>
             </div>
+            <button
+              onClick={onClose}
+              className="p-3 rounded-full hover:bg-white/5 text-slate-500 hover:text-white transition-all"
+            >
+              <X className="w-6 h-6" />
+            </button>
           </div>
 
           {/* Body */}
-          <div className="flex-1 overflow-y-auto px-6 py-5 space-y-7">
+          <div className="flex-1 overflow-y-auto p-8 space-y-10 no-scrollbar">
 
             {/* SECCIÓN 1: Básico */}
-            <section className="space-y-4">
-              <SectionTitle icon={<Calendar className="w-4 h-4" />} label="Información de la sesión" />
+            <section className="space-y-6">
+              <SectionTitle icon={<Calendar className="w-4 h-4" />} label="Datos de la Sesión" />
               
-              <div className="grid grid-cols-2 gap-4">
-                <FieldWrapper label="Fecha de trabajo">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <FieldWrapper label="Fecha">
                   <Input
                     type="date"
                     value={form.visit_date}
                     onChange={(e) => set("visit_date", e.target.value)}
-                    className="rounded-2xl border-gray-100 h-12 text-sm font-bold"
+                    className="rounded-2xl border-white/5 bg-white/5 h-14 text-sm font-bold text-white focus:border-brand-primary/50"
                   />
                 </FieldWrapper>
 
-                <FieldWrapper label="Estado del Sprint">
+                <FieldWrapper label="Estado Final">
                   <select
                     value={form.status}
                     onChange={(e) => set("status", e.target.value as VisitStatus)}
-                    className="w-full h-12 px-4 text-sm rounded-2xl border border-gray-100 bg-white focus:outline-none focus:ring-2 focus:ring-brand-primary/20 font-bold transition-all"
+                    className="w-full h-14 px-6 text-sm font-bold rounded-2xl border border-white/5 bg-white/5 text-white focus:outline-none focus:border-brand-primary/50 transition-all appearance-none"
                   >
-                    <option value="completed">Completado</option>
-                    <option value="cancelled">Re-agendado</option>
-                    <option value="no_show">Pendiente Feedback</option>
-                    <option value="rescheduled">En revisión</option>
+                    <option value="completed" className="bg-brand-dark">Completado</option>
+                    <option value="cancelled" className="bg-brand-dark">Re-agendado</option>
+                    <option value="no_show" className="bg-brand-dark">Pendiente Feedback</option>
+                    <option value="rescheduled" className="bg-brand-dark">En revisión</option>
                   </select>
                 </FieldWrapper>
               </div>
 
               {/* Plan vinculado */}
               {activePlans.length > 0 && (
-                <FieldWrapper label="Roadmap vinculado (opcional)">
+                <FieldWrapper label="Hoja de Ruta / Roadmap">
                   <select
                     value={form.plan_id}
                     onChange={(e) => set("plan_id", e.target.value)}
-                    className="w-full h-12 px-4 text-sm rounded-2xl border border-gray-100 bg-white focus:outline-none focus:ring-2 focus:ring-brand-primary/20 font-bold transition-all"
+                    className="w-full h-14 px-6 text-sm font-bold rounded-2xl border border-white/5 bg-white/5 text-white focus:outline-none focus:border-brand-primary/50 transition-all appearance-none"
                   >
-                    <option value="">Sin proyecto vinculado</option>
+                    <option value="" className="bg-brand-dark">Sin proyecto vinculado</option>
                     {activePlans.map((p) => (
-                      <option key={p.id} value={p.id}>
+                      <option key={p.id} value={p.id} className="bg-brand-dark">
                         {p.treatment_name} {p.body_zone ? `(${p.body_zone})` : ""}
                         {" "}— Hito {p.completed_sessions + 1} de {p.total_sessions}
                       </option>
@@ -225,172 +229,187 @@ export function ModalNuevoSprintLog({ patientId, plans, isOpen, onClose, onSucce
 
               <FieldWrapper label="Tarea / Hito Realizado *">
                 <Input
-                  placeholder="Ej: Implementación de Auth Flow con Supabase"
+                  placeholder="Ej: Maquetación Hero Section y navegación móvil..."
                   value={form.treatment_applied}
                   onChange={(e) => set("treatment_applied", e.target.value)}
-                  className="rounded-2xl border-gray-100 h-12 text-sm"
+                  className="rounded-2xl border-white/5 bg-white/5 h-14 text-sm font-bold text-white placeholder:text-slate-700 focus:border-brand-primary/50"
                 />
               </FieldWrapper>
             </section>
 
             {/* SECCIÓN 2: Componentes */}
-            <section>
+            <section className="space-y-4">
               <button
                 type="button"
                 onClick={() => setShowZones(!showZones)}
-                className="w-full flex items-center justify-between py-2"
+                className="w-full flex items-center justify-between group"
               >
-                <SectionTitle icon={<Code className="w-4 h-4" />} label="Componentes afectados" />
-                {showZones ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+                <SectionTitle icon={<Code className="w-5 h-5" />} label="Componentes Afectados" />
+                <div className="p-2 bg-white/5 rounded-lg text-slate-500 group-hover:text-white transition-colors">
+                    {showZones ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </div>
               </button>
 
               {!showZones && form.body_zones_treated.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mt-2">
+                <div className="flex flex-wrap gap-2 pt-2">
                   {form.body_zones_treated.map((z) => (
-                    <span key={z} className="text-[10px] font-black uppercase bg-brand-primary/10 text-brand-primary px-3 py-1 rounded-full border border-brand-primary/20">
+                    <span key={z} className="text-[10px] font-black uppercase tracking-widest bg-brand-primary/10 text-brand-primary px-4 py-1.5 rounded-xl border border-brand-primary/20">
                       {z}
                     </span>
                   ))}
                 </div>
               )}
 
-              {showZones && (
-                <div className="mt-4 space-y-5">
-                  {PROJECT_COMPONENTS.map((group) => (
-                    <div key={group.group}>
-                      <p className="text-[10px] font-black text-brand-primary/40 uppercase tracking-widest mb-3">
-                        {group.group}
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {group.zones.map((zone) => {
-                          const selected = form.body_zones_treated.includes(zone);
-                          return (
-                            <button
-                              key={zone}
-                              type="button"
-                              onClick={() => toggleZone(zone)}
-                              className={cn(
-                                "text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-xl border transition-all",
-                                selected
-                                  ? "bg-brand-primary text-white border-brand-primary shadow-sm"
-                                  : "bg-white text-gray-600 border-gray-100 hover:border-brand-primary/20 hover:bg-brand-primary/5"
-                              )}
-                            >
-                              {zone}
-                            </button>
-                          );
-                        })}
+              <AnimatePresence>
+                {showZones && (
+                  <motion.div 
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="space-y-6 pt-4 overflow-hidden"
+                  >
+                    {PROJECT_COMPONENTS.map((group) => (
+                      <div key={group.group} className="space-y-3">
+                        <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] ml-2">
+                          {group.group}
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {group.zones.map((zone) => {
+                            const selected = form.body_zones_treated.includes(zone);
+                            return (
+                              <button
+                                key={zone}
+                                type="button"
+                                onClick={() => toggleZone(zone)}
+                                className={cn(
+                                  "text-[10px] font-black uppercase tracking-widest px-4 py-2.5 rounded-xl border transition-all",
+                                  selected
+                                    ? "bg-brand-primary text-white border-brand-primary shadow-xl shadow-brand-primary/20"
+                                    : "bg-white/5 text-slate-400 border-white/5 hover:border-white/20 hover:text-white"
+                                )}
+                              >
+                                {zone}
+                              </button>
+                            );
+                          })}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </section>
 
             {/* SECCIÓN 3: Notas de Desarrollo */}
-            <section className="space-y-5">
+            <section className="space-y-8">
               <SectionTitle icon={<ClipboardList className="w-4 h-4" />} label="Bitácora Técnica" />
 
-              <FieldWrapper label="Estado del Código / Infra">
+              <FieldWrapper label="Estado del Entorno / QA">
                 <Input
-                  placeholder="Ej: Testing OK, Sin regresiones, Estructura limpia"
+                  placeholder="Ej: Builds estables, Test de componentes OK..."
                   value={form.skin_condition}
                   onChange={(e) => set("skin_condition", e.target.value)}
-                  className="rounded-2xl border-gray-100 h-12 text-sm"
+                  className="rounded-2xl border-white/5 bg-white/5 h-14 text-sm font-bold text-white placeholder:text-slate-700"
                 />
               </FieldWrapper>
 
               <FieldWrapper label="Feedback del Cliente">
                 <textarea
-                  placeholder="Observaciones de la cliente, cambios de última hora, aprobación..."
+                  placeholder="Observaciones de la reunión, ajustes solicitados, aprobaciones..."
                   value={form.patient_complaints}
                   onChange={(e) => set("patient_complaints", e.target.value)}
-                  rows={2}
-                  className="w-full px-4 py-3 text-sm rounded-2xl border border-gray-100 resize-none focus:outline-none focus:ring-2 focus:ring-brand-primary/20 h-24 transition-all"
+                  className="w-full px-6 py-4 text-sm font-bold rounded-2xl border border-white/5 bg-white/5 text-white resize-none focus:outline-none focus:border-brand-primary/50 h-32 transition-all placeholder:text-slate-700"
                 />
               </FieldWrapper>
 
-              <FieldWrapper label="Notas de Desarrollo / Sprint">
+              <FieldWrapper label="Notas Técnicas del Sprint">
                 <textarea
-                  placeholder="Detalles técnicos, retos superados, lógica implementada..."
+                  placeholder="Detalles de implementación, retos técnicos, lógica de negocio..."
                   value={form.clinical_notes}
                   onChange={(e) => set("clinical_notes", e.target.value)}
-                  rows={3}
-                  className="w-full px-4 py-3 text-sm rounded-2xl border border-gray-100 resize-none focus:outline-none focus:ring-2 focus:ring-brand-primary/20 h-28 transition-all"
+                  className="w-full px-6 py-4 text-sm font-bold rounded-2xl border border-white/5 bg-white/5 text-white resize-none focus:outline-none focus:border-brand-primary/50 h-40 transition-all placeholder:text-slate-700"
                 />
               </FieldWrapper>
 
-              <FieldWrapper label="Siguientes Pasos (Next Action)">
+              <FieldWrapper label="Próximas Acciones Sugeridas">
                 <textarea
-                  placeholder="Ej: Integrar pasarela de pagos. Revisar responsive en tablet."
+                  placeholder="Ej: Integración con API de pagos, Auditoria de accesibilidad..."
                   value={form.recommendations}
                   onChange={(e) => set("recommendations", e.target.value)}
-                  rows={2}
-                  className="w-full px-4 py-3 text-sm rounded-2xl border border-gray-100 resize-none focus:outline-none focus:ring-2 focus:ring-brand-primary/20 h-24 transition-all"
+                  className="w-full px-6 py-4 text-sm font-bold rounded-2xl border border-white/5 bg-white/5 text-white resize-none focus:outline-none focus:border-brand-primary/50 h-32 transition-all placeholder:text-slate-700"
                 />
               </FieldWrapper>
             </section>
 
-            {/* SECCIÓN 4: Métricas / Tech Stats (colapsable) */}
-            <section>
+            {/* SECCIÓN 4: Métricas */}
+            <section className="space-y-4">
               <button
                 type="button"
                 onClick={() => setShowEquipment(!showEquipment)}
-                className="w-full flex items-center justify-between py-2"
+                className="w-full flex items-center justify-between group"
               >
-                <SectionTitle icon={<Zap className="w-4 h-4" />} label="Métricas & Tech Stats" />
-                {showEquipment ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+                <SectionTitle icon={<Zap className="w-5 h-5" />} label="Métricas & Tech Stats" />
+                <div className="p-2 bg-white/5 rounded-lg text-slate-500 group-hover:text-white transition-colors">
+                    {showEquipment ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </div>
               </button>
 
-              {showEquipment && (
-                <div className="mt-4 grid grid-cols-2 gap-4">
-                  <FieldWrapper label="Stack / Tool">
-                    <Input
-                      placeholder="Ej: Next.js v15"
-                      value={form.equipment_device}
-                      onChange={(e) => set("equipment_device", e.target.value)}
-                      className="rounded-2xl border-gray-100 h-12 text-sm"
-                    />
-                  </FieldWrapper>
+              <AnimatePresence>
+                {showEquipment && (
+                  <motion.div 
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 overflow-hidden"
+                  >
+                    <FieldWrapper label="Stack / Herramienta">
+                      <Input
+                        placeholder="Ej: Next.js + Tailwind"
+                        value={form.equipment_device}
+                        onChange={(e) => set("equipment_device", e.target.value)}
+                        className="rounded-2xl border-white/5 bg-white/5 h-14 text-sm font-bold text-white placeholder:text-slate-700"
+                      />
+                    </FieldWrapper>
 
-                  <FieldWrapper label="Perf / Lighthouse">
-                    <Input
-                      placeholder="Ej: 98/100"
-                      value={form.equipment_fluence}
-                      onChange={(e) => set("equipment_fluence", e.target.value)}
-                      className="rounded-2xl border-gray-100 h-12 text-sm"
-                    />
-                  </FieldWrapper>
+                    <FieldWrapper label="Performance Score">
+                      <Input
+                        placeholder="Ej: 98% Lighthouse"
+                        value={form.equipment_fluence}
+                        onChange={(e) => set("equipment_fluence", e.target.value)}
+                        className="rounded-2xl border-white/5 bg-white/5 h-14 text-sm font-bold text-white placeholder:text-slate-700"
+                      />
+                    </FieldWrapper>
 
-                  <FieldWrapper label="Commits / PRs">
-                    <Input
-                      placeholder="Ej: #12, #13"
-                      value={form.equipment_frequency}
-                      onChange={(e) => set("equipment_frequency", e.target.value)}
-                      className="rounded-2xl border-gray-100 h-12 text-sm"
-                    />
-                  </FieldWrapper>
+                    <FieldWrapper label="Commits / Refs">
+                      <Input
+                        placeholder="Ej: #102, #104"
+                        value={form.equipment_frequency}
+                        onChange={(e) => set("equipment_frequency", e.target.value)}
+                        className="rounded-2xl border-white/5 bg-white/5 h-14 text-sm font-bold text-white placeholder:text-slate-700"
+                      />
+                    </FieldWrapper>
 
-                  <FieldWrapper label="Ref. Logs">
-                    <Input
-                      placeholder="Ej: Log-ID: 45A"
-                      value={form.equipment_notes}
-                      onChange={(e) => set("equipment_notes", e.target.value)}
-                      className="rounded-2xl border-gray-100 h-12 text-sm"
-                    />
-                  </FieldWrapper>
-                </div>
-              )}
+                    <FieldWrapper label="Logs de Error Ref.">
+                      <Input
+                        placeholder="Ej: Sentry-452"
+                        value={form.equipment_notes}
+                        onChange={(e) => set("equipment_notes", e.target.value)}
+                        className="rounded-2xl border-white/5 bg-white/5 h-14 text-sm font-bold text-white placeholder:text-slate-700"
+                      />
+                    </FieldWrapper>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </section>
 
             {/* SECCIÓN 5: Próximo Check-in */}
-            <section>
-              <FieldWrapper label="Próxima sesión sugerida">
+            <section className="pt-4">
+              <FieldWrapper label="Próximo Check-in Sugerido">
                 <Input
                   type="date"
                   value={form.next_visit_date}
                   onChange={(e) => set("next_visit_date", e.target.value)}
-                  className="rounded-2xl border-gray-100 h-12 text-sm font-bold"
+                  className="rounded-2xl border-white/5 bg-white/5 h-14 text-sm font-bold text-white focus:border-brand-primary/50"
                 />
               </FieldWrapper>
             </section>
@@ -398,31 +417,30 @@ export function ModalNuevoSprintLog({ patientId, plans, isOpen, onClose, onSucce
           </div>
 
           {/* Footer */}
-          <div className="flex-shrink-0 flex gap-3 px-6 py-5 border-t border-gray-50 bg-white">
+          <div className="p-8 border-t border-white/5 flex gap-4 bg-white/[0.01]">
             <Button
               variant="outline"
               onClick={onClose}
-              className="flex-1 rounded-2xl border-gray-100 text-gray-600 hover:bg-gray-50 h-12 font-bold"
+              className="flex-1 rounded-2xl h-16 border-white/10 text-slate-400 hover:bg-white/5 hover:text-white font-black uppercase text-[10px] tracking-widest transition-all"
               disabled={isSaving}
             >
-              Cancelar
+              Cerrar
             </Button>
             <Button
               onClick={handleSubmit}
               disabled={isSaving}
-              className="flex-1 bg-brand-primary hover:bg-brand-primary/90 text-white rounded-2xl shadow-lg shadow-brand-primary/20 transition-all active:scale-95 h-12 font-black uppercase tracking-widest text-xs"
+              className="flex-1 bg-brand-primary hover:bg-brand-primary/90 text-white rounded-2xl h-16 shadow-xl shadow-brand-primary/20 transition-all font-black uppercase text-[10px] tracking-widest border-none"
             >
               {isSaving ? (
-                <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Guardando...</>
+                <><Loader2 className="w-5 h-5 mr-3 animate-spin" />Guardando...</>
               ) : (
-                "Guardar Log"
+                "Guardar Registro"
               )}
             </Button>
           </div>
 
-        </div>
-      </div>
-    </>
+        </motion.div>
+    </div>
   );
 }
 
@@ -432,17 +450,17 @@ export function ModalNuevoSprintLog({ patientId, plans, isOpen, onClose, onSucce
 
 function SectionTitle({ icon, label }: { icon: React.ReactNode; label: string }) {
   return (
-    <div className="flex items-center gap-2">
-      <span className="text-brand-primary/40 text-emerald-500">{icon}</span>
-      <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">{label}</span>
+    <div className="flex items-center gap-3">
+      <span className="text-brand-primary/60">{icon}</span>
+      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">{label}</span>
     </div>
   );
 }
 
 function FieldWrapper({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="space-y-1.5 flex-1">
-      <label className="text-[10px] font-black text-brand-primary/40 uppercase tracking-widest">
+    <div className="space-y-3 flex-1">
+      <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-2">
         {label}
       </label>
       {children}

@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Activity, Calendar, Phone, Mail, MapPin, User, Code, Layout, Target, Rocket, CheckCircle, Clock } from "lucide-react";
+import { Activity, Calendar, Phone, Mail, MapPin, User, Code, Layout, Target, Rocket, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format, formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
@@ -19,18 +19,18 @@ type Cliente = {
   email: string | null;
   address: string | null;
   created_at: string;
-  has_allergies: boolean; // Mapped to hasSpecificTechStack
-  allergies_details: string | null; // Mapped to techStackDetails
-  takes_medication: boolean; // Mapped to isUrgent
-  medication_details: string | null; // Mapped to deadlineDetails
-  has_illnesses: boolean; // Mapped to hasFigmaDesign
-  illnesses_details: string | null; // Mapped to figmaLink
-  has_surgeries: boolean; // Mapped to hasExistingCode
-  surgeries_details: string | null; // Mapped to existingCodeDetails
-  sun_exposure: boolean; // Mapped to mainCompetitors exists
-  smokes: boolean; // Mapped to hasBudget
-  smoking_amount: string | null; // Mapped to budgetRange
-  skin_routine: string | null; // Mapped to mainCompetitors
+  has_allergies: boolean; 
+  allergies_details: string | null;
+  takes_medication: boolean;
+  medication_details: string | null;
+  has_illnesses: boolean;
+  illnesses_details: string | null;
+  has_surgeries: boolean;
+  surgeries_details: string | null;
+  sun_exposure: boolean;
+  smokes: boolean;
+  smoking_amount: string | null;
+  skin_routine: string | null;
 };
 
 type ActivePlan = {
@@ -107,22 +107,24 @@ export function TabResumen({ patient, activePlan, lastVisit, totalSessions }: Pr
   }[];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-in fade-in duration-700">
 
       {/* ALERTAS DE DESCUBRIMIENTO */}
       {alerts.length > 0 && (
-        <div className="space-y-3">
-          <p className="text-[10px] font-black text-brand-primary/40 uppercase tracking-widest">
-            Insights de Proyecto
+        <div className="space-y-4">
+          <p className="text-[10px] font-black text-brand-primary/40 uppercase tracking-[0.2em] ml-2">
+            Insights Estratégicos
           </p>
-          {alerts.map((alert, i) => (
-            <AlertCard key={i} {...alert} />
-          ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {alerts.map((alert, i) => (
+                <AlertCard key={i} {...alert} />
+            ))}
+          </div>
         </div>
       )}
 
       {/* STATS RÁPIDOS */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 gap-4">
         <StatCard
           value={totalSessions}
           label="Interacciones"
@@ -141,93 +143,108 @@ export function TabResumen({ patient, activePlan, lastVisit, totalSessions }: Pr
         />
       </div>
 
-      {/* PROYECTO ACTIVO (Anteriormente Plan Activo) */}
+      {/* PROYECTO ACTIVO */}
       {activePlan ? (
-        <div className="bg-gradient-to-br from-brand-primary to-[#5B21B6] rounded-[2rem] p-6 text-white shadow-xl shadow-brand-primary/20">
-          <div className="flex items-center gap-2 mb-4">
-            <Activity className="w-5 h-5 text-white/80" />
-            <p className="text-sm font-bold text-white/80 uppercase tracking-wider">Proyecto Activo</p>
-          </div>
-
-          <h3 className="text-xl font-black text-white mb-1">{activePlan.treatment_name}</h3>
-          {activePlan.body_zone && (
-            <p className="text-sm text-white/70 mb-4">{activePlan.body_zone}</p>
-          )}
-
-          <div className="space-y-2 mb-4">
-            <div className="flex justify-between text-sm">
-              <span className="text-white/80 font-semibold">
-                Hito {activePlan.completed_sessions} de {activePlan.total_sessions}
-              </span>
-              <span className="text-white font-black">{activePlan.progress_percentage}%</span>
+        <div className="glass-card p-8 border border-brand-primary/30 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-64 h-64 radial-glow-purple opacity-20 -translate-y-1/2 translate-x-1/2 blur-[80px]" />
+          
+          <div className="relative z-10">
+            <div className="flex items-center gap-3 mb-6">
+                <div className="p-2.5 bg-brand-primary/20 rounded-xl text-brand-primary border border-brand-primary/30">
+                    <Activity className="w-5 h-5" />
+                </div>
+                <p className="text-[10px] font-black text-brand-primary uppercase tracking-[0.2em]">Hoja de Ruta Activa</p>
             </div>
-            <div className="h-2.5 bg-white/20 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-white rounded-full transition-all duration-700"
-                style={{ width: `${activePlan.progress_percentage}%` }}
-              />
+
+            <h3 className="text-2xl font-black text-white mb-2 font-heading tracking-tight">{activePlan.treatment_name}</h3>
+            {activePlan.body_zone && (
+                <p className="text-sm text-slate-400 mb-8 font-medium">{activePlan.body_zone}</p>
+            )}
+
+            <div className="space-y-3 mb-6">
+                <div className="flex justify-between items-end">
+                    <div className="space-y-1">
+                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Progreso Actual</span>
+                        <p className="text-sm font-black text-white">Consumo {activePlan.completed_sessions} de {activePlan.total_sessions} sesiones</p>
+                    </div>
+                    <span className="text-2xl font-black text-brand-primary tracking-tighter">{activePlan.progress_percentage}%</span>
+                </div>
+                <div className="h-3 bg-white/5 rounded-full overflow-hidden border border-white/10 p-0.5">
+                <div
+                    className="h-full bg-gradient-to-r from-brand-primary to-blue-500 rounded-full transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(116,39,165,0.5)]"
+                    style={{ width: `${activePlan.progress_percentage}%` }}
+                />
+                </div>
             </div>
-          </div>
 
-          {activePlan.completed_sessions < activePlan.total_sessions && (
-            <p className="text-xs text-white/70">
-              Quedan {activePlan.total_sessions - activePlan.completed_sessions} entregables
-              · Próximo check en ~{activePlan.session_interval_days} días
-            </p>
-          )}
-        </div>
-      ) : (
-        <div className="bg-gray-50 rounded-[2rem] p-6 border-2 border-dashed border-gray-200 text-center">
-          <Activity className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-          <p className="text-gray-500 font-semibold text-sm">Sin proyecto activo</p>
-          <p className="text-gray-400 text-xs mt-1">Define el alcance para iniciar el desarrollo</p>
-        </div>
-      )}
-
-      {/* ÚLTIMA INTERACCIÓN */}
-      {lastVisit ? (
-        <div className="bg-white rounded-[2rem] border border-gray-100 p-6 shadow-sm">
-          <div className="flex items-center gap-2 mb-4">
-            <Clock className="w-4 h-4 text-brand-primary/40" />
-            <p className="text-[10px] font-black text-brand-primary/40 uppercase tracking-widest">
-              Último Log
-            </p>
-          </div>
-
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1">
-              <p className="font-bold text-gray-800">{lastVisit.treatment_applied}</p>
-              <p className="text-xs text-gray-400 mt-0.5">
-                Sprint #{lastVisit.session_number} ·{" "}
-                {format(new Date(lastVisit.visit_date + "T12:00:00"), "d MMM yyyy", { locale: es })}
-              </p>
-              {lastVisit.clinical_notes && (
-                <p className="text-sm text-gray-600 mt-2 line-clamp-2 italic">
-                  "{lastVisit.clinical_notes}"
-                </p>
-              )}
-            </div>
+            {activePlan.completed_sessions < activePlan.total_sessions && (
+                <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 bg-white/5 px-4 py-2 rounded-xl w-fit border border-white/10 uppercase tracking-widest">
+                    <Clock className="w-3.5 h-3.5 text-brand-primary" />
+                    Restan {activePlan.total_sessions - activePlan.completed_sessions} entregables · Próxima fase en ~{activePlan.session_interval_days} días
+                </div>
+            )}
           </div>
         </div>
       ) : (
-        <div className="bg-gray-50 rounded-[2rem] p-5 border-2 border-dashed border-gray-200 text-center">
-          <Calendar className="w-7 h-7 text-gray-300 mx-auto mb-2" />
-          <p className="text-gray-500 font-semibold text-sm">Sin interacciones registradas</p>
-          <p className="text-gray-400 text-xs mt-1">Registra la reunión de kickoff</p>
+        <div className="glass-card p-12 border-2 border-dashed border-white/5 text-center flex flex-col items-center gap-4">
+          <div className="w-20 h-20 rounded-[2rem] bg-white/5 flex items-center justify-center text-slate-600 border border-white/5">
+            <Activity className="w-10 h-10" />
+          </div>
+          <div className="space-y-1">
+            <p className="text-white font-black uppercase tracking-widest text-sm">Sin proyecto activo</p>
+            <p className="text-slate-500 text-xs font-medium">Define el alcance para iniciar el desarrollo del roadmap.</p>
+          </div>
         </div>
       )}
 
-      {/* DATOS DE CONTACTO */}
-      <div className="bg-white rounded-[2rem] border border-gray-100 p-6 shadow-sm">
-        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">
-          Data de Cliente
-        </p>
-        <div className="space-y-3">
-          <ContactRow icon={<User className="w-4 h-4" />} value={`ID · ${patient.id_number}`} />
-          <ContactRow icon={<Phone className="w-4 h-4" />} value={patient.phone} />
-          {patient.email && <ContactRow icon={<Mail className="w-4 h-4" />} value={patient.email} />}
-          {patient.address && <ContactRow icon={<MapPin className="w-4 h-4" />} value={patient.address} />}
-        </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* ÚLTIMA INTERACCIÓN */}
+          {lastVisit ? (
+            <div className="glass-card p-8 border border-white/5 space-y-6">
+                <div className="flex items-center gap-3">
+                    <div className="p-2.5 bg-brand-secondary/10 rounded-xl text-brand-secondary border border-brand-secondary/20">
+                        <Clock className="w-5 h-5" />
+                    </div>
+                <p className="text-[10px] font-black text-brand-secondary uppercase tracking-[0.2em]">Última Bitácora</p>
+                </div>
+
+                <div className="space-y-4">
+                    <div>
+                        <p className="text-lg font-black text-white tracking-tight">{lastVisit.treatment_applied}</p>
+                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">
+                            SPRINT #{lastVisit.session_number} ·{" "}
+                            {format(new Date(lastVisit.visit_date + "T12:00:00"), "d MMM yyyy", { locale: es })}
+                        </p>
+                    </div>
+                    
+                    {lastVisit.clinical_notes && (
+                        <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
+                            <p className="text-sm text-slate-300 leading-relaxed italic">
+                            "{lastVisit.clinical_notes}"
+                            </p>
+                        </div>
+                    )}
+                </div>
+            </div>
+          ) : (
+            <div className="glass-card p-8 border-2 border-dashed border-white/5 text-center flex flex-col items-center justify-center gap-4">
+                <Calendar className="w-8 h-8 text-slate-700" />
+                <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Sin interacciones registradas</p>
+            </div>
+          )}
+
+          {/* DATOS DE CONTACTO */}
+          <div className="glass-card p-8 border border-white/5 space-y-6">
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                Data del Cliente
+            </p>
+            <div className="space-y-4">
+                <ContactRow icon={<User className="w-4 h-4" />} value={`ID · ${patient.id_number}`} />
+                <ContactRow icon={<Phone className="w-4 h-4" />} value={patient.phone} />
+                {patient.email && <ContactRow icon={<Mail className="w-4 h-4" />} value={patient.email} />}
+                {patient.address && <ContactRow icon={<MapPin className="w-4 h-4" />} value={patient.address} />}
+            </div>
+          </div>
       </div>
 
     </div>
@@ -239,10 +256,10 @@ export function TabResumen({ patient, activePlan, lastVisit, totalSessions }: Pr
 // ─────────────────────────────────────────────
 
 const ALERT_STYLES: Record<string, { bg: string; border: string; iconBg: string; title: string; detail: string; hint: string }> = {
-  red:     { bg: "bg-red-50/60",     border: "border-red-100",     iconBg: "bg-red-500",     title: "text-red-900",     detail: "text-red-700",     hint: "text-red-500/80" },
-  emerald: { bg: "bg-emerald-50/60", border: "border-emerald-100", iconBg: "bg-emerald-500", title: "text-emerald-900", detail: "text-emerald-700", hint: "text-emerald-500/80" },
-  blue:    { bg: "bg-blue-50/60",    border: "border-blue-100",    iconBg: "bg-blue-500",    title: "text-blue-900",    detail: "text-blue-700",    hint: "text-blue-500/80" },
-  slate:   { bg: "bg-slate-50/60",   border: "border-slate-100",   iconBg: "bg-slate-500",   title: "text-slate-900",   detail: "text-slate-600",   hint: "text-slate-500/80" },
+  red:     { bg: "bg-rose-500/10",    border: "border-rose-500/20",    iconBg: "bg-rose-500",    title: "text-white",     detail: "text-rose-200",    hint: "text-rose-500/80" },
+  emerald: { bg: "bg-emerald-500/10", border: "border-emerald-500/20", iconBg: "bg-emerald-500", title: "text-white",     detail: "text-emerald-200", hint: "text-emerald-500/80" },
+  blue:    { bg: "bg-blue-500/10",    border: "border-blue-500/20",    iconBg: "bg-blue-500",    title: "text-white",     detail: "text-blue-200",    hint: "text-blue-500/80" },
+  slate:   { bg: "bg-slate-500/10",   border: "border-slate-500/20",   iconBg: "bg-slate-500",   title: "text-white",     detail: "text-slate-300",   hint: "text-slate-500/80" },
 };
 
 function AlertCard({ color, icon, title, detail, hint }: {
@@ -250,14 +267,14 @@ function AlertCard({ color, icon, title, detail, hint }: {
 }) {
   const s = ALERT_STYLES[color] ?? ALERT_STYLES.slate;
   return (
-    <div className={cn("rounded-2xl border p-4 flex items-start gap-3", s.bg, s.border)}>
-      <div className={cn("p-2 rounded-xl text-white flex-shrink-0", s.iconBg)}>
+    <div className={cn("rounded-2xl border p-5 flex items-start gap-4 transition-all hover:scale-[1.02]", s.bg, s.border)}>
+      <div className={cn("p-2.5 rounded-xl text-white flex-shrink-0 shadow-lg", s.iconBg)}>
         {icon}
       </div>
       <div>
-        <p className={cn("font-bold text-sm", s.title)}>{title}</p>
-        <p className={cn("text-sm font-semibold mt-0.5", s.detail)}>{detail}</p>
-        <p className={cn("text-xs mt-1", s.hint)}>{hint}</p>
+        <p className={cn("font-black text-sm tracking-tight", s.title)}>{title}</p>
+        <p className={cn("text-xs font-bold mt-1 opacity-90", s.detail)}>{detail}</p>
+        <p className={cn("text-[9px] font-black uppercase tracking-widest mt-2", s.hint)}>{hint}</p>
       </div>
     </div>
   );
@@ -267,23 +284,23 @@ function StatCard({ value, label, color, small }: {
   value: string | number; label: string; color: string; small?: boolean;
 }) {
   const colors: Record<string, string> = {
-    violet:  "from-violet-50 to-violet-100/50 text-brand-primary",
-    emerald: "from-emerald-50 to-emerald-100/50 text-emerald-700",
-    slate:   "from-slate-50 to-slate-100/50 text-slate-700",
+    violet:  "from-brand-primary/20 to-brand-primary/5 text-brand-primary border-brand-primary/20",
+    emerald: "from-emerald-500/20 to-emerald-500/5 text-emerald-400 border-emerald-500/20",
+    slate:   "from-slate-500/20 to-slate-500/5 text-slate-400 border-white/10",
   };
   return (
-    <div className={cn("rounded-2xl p-4 bg-gradient-to-br text-center", colors[color] ?? colors.slate)}>
-      <p className={cn("font-black", small ? "text-lg leading-tight" : "text-2xl")}>{value}</p>
-      <p className="text-[10px] font-bold uppercase tracking-widest mt-1 opacity-70">{label}</p>
+    <div className={cn("rounded-[2rem] p-6 bg-gradient-to-br text-center border transition-all hover:-translate-y-1", colors[color] ?? colors.slate)}>
+      <p className={cn("font-black tracking-tighter", small ? "text-lg leading-tight" : "text-3xl")}>{value}</p>
+      <p className="text-[10px] font-black uppercase tracking-[0.2em] mt-2 opacity-50">{label}</p>
     </div>
   );
 }
 
 function ContactRow({ icon, value }: { icon: React.ReactNode; value: string }) {
   return (
-    <div className="flex items-center gap-3 text-gray-600">
-      <span className="text-brand-primary/40 flex-shrink-0">{icon}</span>
-      <span className="text-sm font-medium">{value}</span>
+    <div className="flex items-center gap-4 text-slate-300 group cursor-default">
+      <span className="text-brand-primary/40 flex-shrink-0 bg-white/5 p-2 rounded-lg border border-white/5 group-hover:text-brand-primary group-hover:border-brand-primary/30 transition-all">{icon}</span>
+      <span className="text-sm font-bold tracking-tight">{value}</span>
     </div>
   );
 }

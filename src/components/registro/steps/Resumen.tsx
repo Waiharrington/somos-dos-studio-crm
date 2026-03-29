@@ -21,8 +21,6 @@ export default function Resumen() {
                     <div className="text-gray-700 font-semibold">Nombre:</div>
                     <div className="font-bold text-gray-900">{data.personal.firstName} {data.personal.lastName}</div>
 
-                    <div className="text-gray-700 font-semibold">ID/Cédula:</div>
-                    <div className="font-bold text-gray-900">{data.personal.idNumber}</div>
 
                     <div className="text-gray-700 font-semibold">Email:</div>
                     <div className="font-bold text-gray-900">{data.personal.email || "N/A"}</div>
