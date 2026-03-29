@@ -1,219 +1,98 @@
-import { useFormContext, useWatch } from "react-hook-form";
-import { FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { useFormContext, Controller } from "react-hook-form";
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
-import { motion, AnimatePresence } from "framer-motion";
+
+const predefinedServices = [
+    { id: "edicion", label: "Ediciones de videos" },
+    { id: "guionizacion", label: "Guionización / Dirección de video" },
+    { id: "contenidos", label: "Plan de contenidos" },
+    { id: "web", label: "Página web / Landing Page" },
+    { id: "consultoria", label: "Consultoría / Asesoría" },
+    { id: "ia", label: "Automatización / IA" },
+    { id: "ads", label: "Gestión de ADS" },
+    { id: "software", label: "Sistema personalizado (Software o CRM)" },
+    { id: "fotos", label: "Sesiones de fotos / Fotografía" },
+];
 
 export default function Descubrimiento() {
     const { control } = useFormContext();
 
-    const hasExistingCode = useWatch({ control, name: "discovery.hasExistingCode" });
-    const hasSpecificTechStack = useWatch({ control, name: "discovery.hasSpecificTechStack" });
-    const hasFigmaDesign = useWatch({ control, name: "discovery.hasFigmaDesign" });
-    const isUrgent = useWatch({ control, name: "discovery.isUrgent" });
-
     return (
-        <div className="space-y-6 animate-in fade-in zoom-in-95 duration-500">
-
-            {/* Código Existente */}
-            <div className="bg-brand-primary/5 p-4 rounded-2xl border border-brand-primary/20">
-                <FormField
-                    control={control}
-                    name="discovery.hasExistingCode"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md p-2">
-                            <FormControl>
-                                <Checkbox
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
+        <div className="space-y-8 animate-in fade-in zoom-in-95 duration-500">
+            {/* Servicios Múltiples */}
+            <FormField
+                control={control}
+                name="discovery.selectedServices"
+                render={() => (
+                    <FormItem>
+                        <div className="mb-4">
+                            <FormLabel className="text-xl font-bold text-white">Servicios Acordados</FormLabel>
+                            <p className="text-slate-400 text-sm">
+                                Selecciona todos los servicios que se le ofrecerán al cliente.
+                            </p>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {predefinedServices.map((service) => (
+                                <Controller
+                                    key={service.id}
+                                    control={control}
+                                    name="discovery.selectedServices"
+                                    render={({ field }) => {
+                                        return (
+                                            <FormItem
+                                                key={service.id}
+                                                className="flex flex-row items-start space-x-3 space-y-0 rounded-xl p-4 border border-white/5 bg-white/5 hover:bg-white/10 transition-colors"
+                                            >
+                                                <FormControl>
+                                                    <Checkbox
+                                                        checked={field.value?.includes(service.id)}
+                                                        onCheckedChange={(checked) => {
+                                                            return checked
+                                                                ? field.onChange([...(field.value || []), service.id])
+                                                                : field.onChange(
+                                                                      field.value?.filter(
+                                                                          (value: string) => value !== service.id
+                                                                      )
+                                                                  );
+                                                        }}
+                                                    />
+                                                </FormControl>
+                                                <FormLabel className="font-semibold text-slate-200 cursor-pointer w-full">
+                                                    {service.label}
+                                                </FormLabel>
+                                            </FormItem>
+                                        );
+                                    }}
                                 />
-                            </FormControl>
-                            <div className="space-y-1 leading-none">
-                                <FormLabel className="text-base font-bold text-gray-900">
-                                    ¿Ya existe una versión previa o código base?
-                                </FormLabel>
-                                <FormDescription className="text-gray-600 font-medium">
-                                    Si es una migración o rediseño de un sistema actual.
-                                </FormDescription>
-                            </div>
-                        </FormItem>
-                    )}
-                />
+                            ))}
+                        </div>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
 
-                <AnimatePresence>
-                    {hasExistingCode && (
-                        <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            className="overflow-hidden pl-7 pt-2"
-                        >
-                            <FormField
-                                control={control}
-                                name="discovery.existingCodeDetails"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-gray-900 font-semibold">Detalles del sistema actual</FormLabel>
-                                        <FormControl>
-                                            <Textarea placeholder="Ej. Repositorio actual, tecnologías usadas..." {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
+            {/* Resumen de lo acordado */}
+            <FormField
+                control={control}
+                name="discovery.agreedSummary"
+                render={({ field }) => (
+                    <FormItem className="pt-4 border-t border-white/10">
+                        <FormLabel className="text-xl font-bold text-white">Resumen de lo Acordado</FormLabel>
+                        <p className="text-slate-400 text-sm mb-3">
+                            Describe exactamente qué se acordó, qué se ofreció y cómo se planteó el proyecto.
+                        </p>
+                        <FormControl>
+                            <Textarea 
+                                placeholder="Ej. Se acordó la creación de una landing page en 2 semanas, con 3 revisiones mensuales y gestión de redes (3 posts/semana)..." 
+                                className="min-h-[150px] bg-white/5 border-white/10 text-white placeholder:text-slate-500 rounded-2xl"
+                                {...field} 
                             />
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </div>
-
-            {/* Tech Stack */}
-            <div className="bg-brand-primary/5 p-4 rounded-2xl border border-brand-primary/20">
-                <FormField
-                    control={control}
-                    name="discovery.hasSpecificTechStack"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md p-2">
-                            <FormControl>
-                                <Checkbox
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                />
-                            </FormControl>
-                            <div className="space-y-1 leading-none">
-                                <FormLabel className="text-base font-bold text-gray-900">
-                                    ¿Tienes preferencia por algún Stack Técnico?
-                                </FormLabel>
-                                <FormDescription className="text-gray-600 font-medium">
-                                    Next.js, Python, Supabase, AWS, etc.
-                                </FormDescription>
-                            </div>
-                        </FormItem>
-                    )}
-                />
-
-                <AnimatePresence>
-                    {hasSpecificTechStack && (
-                        <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            className="overflow-hidden pl-7 pt-2"
-                        >
-                            <FormField
-                                control={control}
-                                name="discovery.techStackDetails"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-gray-900 font-semibold">Especifica las tecnologías</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="Ej. Requerimos usar PostgreSQL y React Native..." {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </div>
-
-            {/* Diseño Figma */}
-            <div className="bg-brand-primary/5 p-4 rounded-2xl border border-brand-primary/20">
-                <FormField
-                    control={control}
-                    name="discovery.hasFigmaDesign"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md p-2">
-                            <FormControl>
-                                <Checkbox
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                />
-                            </FormControl>
-                            <div className="space-y-1 leading-none">
-                                <FormLabel className="text-base font-bold text-gray-900">
-                                    ¿Ya cuentas con el diseño (Figma/Adobe XD)?
-                                </FormLabel>
-                            </div>
-                        </FormItem>
-                    )}
-                />
-
-                <AnimatePresence>
-                    {hasFigmaDesign && (
-                        <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            className="overflow-hidden pl-7 pt-2"
-                        >
-                            <FormField
-                                control={control}
-                                name="discovery.figmaLink"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-gray-900 font-semibold">Link del diseño</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="URL de Figma..." {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </div>
-
-            {/* Urgencia */}
-            <div className="bg-brand-primary/5 p-4 rounded-2xl border border-brand-primary/20">
-                <FormField
-                    control={control}
-                    name="discovery.isUrgent"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md p-2">
-                            <FormControl>
-                                <Checkbox
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                />
-                            </FormControl>
-                            <div className="space-y-1 leading-none">
-                                <FormLabel className="text-base font-bold text-gray-900">
-                                    ¿El proyecto tiene una fecha límite estricta?
-                                </FormLabel>
-                            </div>
-                        </FormItem>
-                    )}
-                />
-
-                <AnimatePresence>
-                    {isUrgent && (
-                        <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            className="overflow-hidden pl-7 pt-2"
-                        >
-                            <FormField
-                                control={control}
-                                name="discovery.deadlineDetails"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-gray-900 font-semibold">Indica la fecha y motivo</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="Ej. Lanzamiento en 3 meses por evento..." {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </div>
-
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
         </div>
     );
 }

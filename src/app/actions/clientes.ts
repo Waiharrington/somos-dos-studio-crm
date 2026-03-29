@@ -12,7 +12,7 @@ import { createClient } from "@/lib/supabase-server";
 export async function saveClienteAction(formData: ClienteFormData) {
     try {
         const supabase = await createClient();
-        const { personal, discovery, scope, treatment, signature } = formData;
+        const { personal, discovery, scope, treatment } = formData;
 
         // Se generará un ID temporal porque la DB lo requiere,
         // pero ya no lo pedimos en el formulario.
@@ -30,36 +30,33 @@ export async function saveClienteAction(formData: ClienteFormData) {
                     address: personal.address,
                     email: personal.email || null,
 
-                    // Mapeo de Descubrimiento Técnico
-                    has_surgeries: discovery.hasExistingCode,
-                    surgeries_details: discovery.existingCodeDetails || null,
-                    has_allergies: discovery.hasSpecificTechStack,
-                    allergies_details: discovery.techStackDetails || null,
-                    has_illnesses: discovery.hasFigmaDesign,
-                    illnesses_details: discovery.figmaLink || null,
-                    takes_medication: discovery.isUrgent,
-                    medication_details: discovery.deadlineDetails || null,
+                    // Legacy database columns that we keep for backward compatibility
+                    // but won't use for agency CRM leads
+                    has_surgeries: false,
+                    surgeries_details: null,
+                    has_allergies: false,
+                    allergies_details: null,
+                    has_illnesses: false,
+                    illnesses_details: null,
+                    takes_medication: false,
+                    medication_details: null,
 
-                    // Mapeo de Alcance y Negocio
-                    smokes: scope.hasBudget,
-                    smoking_amount: scope.budgetRange || null,
-                    exercises: scope.isNewBusiness,
-                    exercise_details: scope.targetAudience || null,
-                    sun_exposure: scope.mainCompetitors ? true : false,
-                    skin_routine: scope.mainCompetitors || null,
+                    smokes: false,
+                    smoking_amount: null,
+                    exercises: false,
+                    exercise_details: null,
+                    sun_exposure: false,
+                    skin_routine: null,
 
-                    treatment_type: treatment.treatmentType,
+                    treatment_type: "agency_project",
                     treatment_details: {
-                        discovery: discovery,
+                        services: discovery,
                         scope: scope,
-                        project: {
-                            objective: treatment.objective,
-                            references: treatment.references
-                        }
+                        project: treatment
                     },
 
-                    signature_data: signature.signatureData,
-                    consent_accepted: signature.consent,
+                    signature_data: null,
+                    consent_accepted: true,
                     status: 'Prospecto'
                 }
             ])
@@ -70,12 +67,11 @@ export async function saveClienteAction(formData: ClienteFormData) {
             return { success: false, error: error.message };
         }
 
-        // 2. Notificación (Podemos adaptar el template de email luego)
         sendNewPatientNotification({
             firstName: personal.firstName,
             lastName: personal.lastName,
             idNumber: generatedId,
-            treatmentType: treatment.treatmentType
+            treatmentType: "agency_project"
         }).catch(err => console.error("Error disparando notificación:", err));
 
         revalidatePath("/admin");

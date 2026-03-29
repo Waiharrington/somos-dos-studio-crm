@@ -12,20 +12,15 @@ import DatosPersonales from "./steps/DatosPersonales";
 import Descubrimiento from "./steps/Descubrimiento";
 import Alcance from "./steps/Alcance";
 import Servicio from "./steps/Servicio";
-import Acuerdo from "./steps/Acuerdo";
-import Resumen from "./steps/Resumen";
 import { cn } from "@/lib/utils";
 import { saveClienteAction } from "@/app/actions/clientes";
 import { Loader2 } from "lucide-react";
 
-// Definición de pasos
 const steps = [
     { id: "personal", title: "Datos Personales", component: DatosPersonales, fields: ["personal"] },
-    { id: "discovery", title: "Descubrimiento", component: Descubrimiento, fields: ["discovery"] },
-    { id: "scope", title: "Alcance", component: Alcance, fields: ["scope"] },
-    { id: "treatment", title: "Servicio", component: Servicio, fields: ["treatment"] },
-    { id: "signature", title: "Acuerdo", component: Acuerdo, fields: ["signature"] },
-    { id: "resumen", title: "Resumen", component: Resumen, fields: [] }, // Paso final sin validación propia
+    { id: "discovery", title: "Servicios", component: Descubrimiento, fields: ["discovery"] },
+    { id: "scope", title: "Alcance y Pago", component: Alcance, fields: ["scope"] },
+    { id: "treatment", title: "Detalles", component: Servicio, fields: ["treatment"] },
 ];
 
 export default function Wizard() {
@@ -33,7 +28,6 @@ export default function Wizard() {
     const [direction, setDirection] = useState(0);
 
     const methods = useForm<ClienteFormData>({
-        // @ts-expect-error - Resolver types mismatch with deep nested default values but logic is sound
         resolver: zodResolver(clienteFormSchema),
         mode: "onChange",
         defaultValues: {
@@ -45,23 +39,16 @@ export default function Wizard() {
                 email: "",
             },
             discovery: {
-                hasExistingCode: false,
-                hasSpecificTechStack: false,
-                hasFigmaDesign: false,
-                isUrgent: false,
+                selectedServices: [],
+                agreedSummary: "",
             },
             scope: {
-                hasBudget: false,
-                isNewBusiness: false,
+                agreedBudget: "",
+                paymentMode: "",
             },
             treatment: {
-                treatmentType: "",
                 objective: "",
                 references: "",
-            },
-            signature: {
-                signatureData: "",
-                consent: false,
             }
         }
     });
@@ -95,21 +82,14 @@ export default function Wizard() {
         methods.setValue("personal.address", "Caracas, Las Mercedes");
         methods.setValue("personal.email", "info@somosdostudio.com");
 
-        methods.setValue("discovery.hasExistingCode", true);
-        methods.setValue("discovery.existingCodeDetails", "Legacy PHP system with MySQL");
-        methods.setValue("discovery.hasSpecificTechStack", true);
-        methods.setValue("discovery.techStackDetails", "Next.js, Tailwind, Supabase");
-        methods.setValue("discovery.hasFigmaDesign", true);
-        methods.setValue("discovery.figmaLink", "https://figma.com/file/somosdos-mockup");
+        methods.setValue("discovery.selectedServices", ["webapp", "consulting"]);
+        methods.setValue("discovery.agreedSummary", "Se acordó desarrollar un CRM y dar 2 horas de consultoría.");
+        
+        methods.setValue("scope.agreedBudget", "$5,000");
+        methods.setValue("scope.paymentMode", "quincenal");
 
-        methods.setValue("scope.hasBudget", true);
-        methods.setValue("scope.budgetRange", "$5,000+");
-        methods.setValue("scope.isNewBusiness", true);
-        methods.setValue("scope.targetAudience", "Tech startups and local businesses");
-
-        methods.setValue("treatment.treatmentType", "webapp");
         methods.setValue("treatment.objective", "Build a scalable CRM for the studio.");
-        methods.setValue("treatment.references", "Next.js, Tailwind, Supabase examples");
+        methods.setValue("treatment.references", "https://notion.so, https://salesforce.com");
     };
 
     const slideVariants = {
@@ -170,13 +150,18 @@ export default function Wizard() {
                     icon: "🚀",
                 });
 
-                setCurrentStep(steps.length - 1);
+                // Limpiar el form o redirigir (opcional)
+                // methods.reset();
+                setTimeout(() => {
+                    window.location.reload();
+                }, 3000);
             } else {
                 toast.error("Error al guardar", {
                     description: error || "Hubo un problema al conectar con el servidor.",
                 });
             }
-        } catch (_err) {
+        } catch (error) {
+            console.error(error);
             toast.error("Error inesperado", {
                 description: "Por favor intenta de nuevo en unos minutos.",
             });
@@ -189,22 +174,22 @@ export default function Wizard() {
         <div className="max-w-3xl mx-auto p-6">
             <div className="mb-8 hidden md:block">
                 <div className="flex justify-between items-center relative">
-                    <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-200 -z-10 rounded-full" />
+                    <div className="absolute top-1/2 left-0 w-full h-1 bg-slate-800 -z-10 rounded-full" />
                     {steps.map((step, index) => (
-                        <div key={step.id} className="flex flex-col items-center gap-2 bg-white px-2">
+                        <div key={step.id} className="flex flex-col items-center gap-2 bg-slate-950 px-2">
                             <div
                                 className={cn(
                                     "w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 border-2",
                                     index <= currentStep
                                         ? "bg-brand-primary border-brand-primary/20 text-white shadow-lg shadow-brand-primary/30"
-                                        : "bg-white border-gray-300 text-gray-400"
+                                        : "bg-slate-900 border-slate-800 text-slate-500"
                                 )}
                             >
                                 {index + 1}
                             </div>
                             <span className={cn(
                                 "text-[10px] font-medium uppercase tracking-wider",
-                                index <= currentStep ? "text-brand-primary" : "text-gray-400"
+                                index <= currentStep ? "text-brand-400" : "text-slate-500"
                             )}>
                                 {step.title}
                             </span>
@@ -218,7 +203,7 @@ export default function Wizard() {
                     <span className="text-xs font-bold text-brand-primary uppercase tracking-wider">
                         Paso {currentStep + 1} de {steps.length}
                     </span>
-                    <h2 className="text-xl font-bold text-gray-900 leading-tight">
+                    <h2 className="text-xl font-bold text-white leading-tight">
                         {steps[currentStep].title}
                     </h2>
                 </div>
@@ -228,7 +213,7 @@ export default function Wizard() {
             </div>
 
             <FormProvider {...methods}>
-                <form onSubmit={methods.handleSubmit(onSubmit as any)} className="space-y-8">
+                <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-8">
                     <div className="bg-slate-900/60 backdrop-blur-xl border border-white/10 shadow-[0_0_40px_-10px_rgba(0,0,0,0.5)] rounded-3xl p-6 md:p-10 min-h-[400px] relative overflow-hidden text-gray-100">
                         <button
                             type="button"
@@ -284,7 +269,7 @@ export default function Wizard() {
                                     type="button"
                                     className="bg-brand-primary hover:bg-brand-primary/90 text-white shadow-lg shadow-brand-primary/20 px-8 rounded-full"
                                     disabled={isSubmitting}
-                                    onClick={methods.handleSubmit(onSubmit as any)}
+                                    onClick={methods.handleSubmit(onSubmit)}
                                 >
                                     {isSubmitting ? (
                                         <>
