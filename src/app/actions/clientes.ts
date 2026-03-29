@@ -17,10 +17,12 @@ export async function saveClienteAction(formData: ClienteFormData) {
         let generatedId = `SD-${Date.now()}`;
 
         // 1. BUSCAR CLIENTE EXISTENTE POR TELÉFONO
+        // Usamos limit(1) para evitar error si hay duplicados de prueba
         const { data: existingPatient, error: searchError } = await supabase
             .from("patients")
             .select("id, id_number")
             .eq("phone", personal.phone)
+            .limit(1)
             .maybeSingle();
 
         if (searchError) throw searchError;
@@ -217,6 +219,7 @@ export async function getClienteByPhoneAction(phone: string) {
             .from("patients")
             .select("id, first_name, last_name, id_number")
             .eq("phone", phone)
+            .limit(1)
             .maybeSingle();
 
         if (error) throw error;
