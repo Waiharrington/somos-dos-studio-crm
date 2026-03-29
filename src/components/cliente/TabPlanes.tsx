@@ -84,7 +84,7 @@ export function TabPlanes({ patientId, plans, onRefresh }: Props) {
       <div className="flex items-center justify-between bg-white/[0.02] p-6 rounded-[2rem] border border-white/5 shadow-xl">
         <div className="space-y-1">
           <p className="text-sm font-black text-white uppercase tracking-tight">
-            {activePlans.length} Hoja{activePlans.length !== 1 ? "s" : ""} de Ruta activa{activePlans.length !== 1 ? "s" : ""}
+            {activePlans.length} Proyecto{activePlans.length !== 1 ? "s" : ""} activo{activePlans.length !== 1 ? "s" : ""}
           </p>
           <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{plans.length} servicios totales registrados</p>
         </div>
@@ -93,7 +93,7 @@ export function TabPlanes({ patientId, plans, onRefresh }: Props) {
           className="bg-brand-primary hover:bg-brand-primary/90 text-white rounded-2xl px-8 h-12 shadow-xl shadow-brand-primary/20 text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 border-none"
         >
           <Plus className="w-4 h-4 mr-2" />
-          Nueva Hoja de Ruta
+          Nuevo Proyecto
         </Button>
       </div>
 
@@ -116,8 +116,8 @@ export function TabPlanes({ patientId, plans, onRefresh }: Props) {
 
       {/* Planes inactivos */}
       {inactivePlans.length > 0 && (
-        <div className="space-y-4">
-          <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-2">Historial de Roadmaps</p>
+            <div className="space-y-4">
+          <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-2">Historial de Proyectos</p>
           <div className="space-y-4">
             {inactivePlans.map((plan) => (
                 <PlanCard
@@ -138,9 +138,9 @@ export function TabPlanes({ patientId, plans, onRefresh }: Props) {
                 <Target className="w-10 h-10 text-slate-700 group-hover:text-brand-primary transition-colors" />
             </div>
             <div className="space-y-1">
-                <p className="font-black text-white uppercase tracking-widest text-sm">Sin roadmaps asignados</p>
+                <p className="font-black text-white uppercase tracking-widest text-sm">Sin proyectos asignados</p>
                 <p className="text-xs text-slate-500 max-w-xs font-medium leading-relaxed">
-                Asigna una hoja de ruta para gestionar los hitos y el progreso del proyecto de desarrollo.
+                Asigna un proyecto para gestionar los hitos y el progreso del desarrollo.
                 </p>
             </div>
         </div>
@@ -315,7 +315,7 @@ function PlanCard({ plan, patientId, onRefresh }: {
                         onClick={() => updateStatus("completed")}
                         className="flex-1 rounded-2xl text-[10px] font-black uppercase tracking-widest border-emerald-500/20 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white h-12 transition-all"
                     >
-                        {updating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Finalizar Roadmap"}
+                        {updating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Finalizar Proyecto"}
                     </Button>
                     <Button
                         variant="outline"

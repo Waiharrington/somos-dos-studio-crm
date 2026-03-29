@@ -53,7 +53,7 @@ export function ModalNuevoPlan({ patientId, isOpen, onClose, onSuccess }: Props)
       return;
     }
     if (!form.total_sessions || form.total_sessions < 1) {
-      toast.error("Indica cuántos hitos tiene el roadmap.");
+      toast.error("Indica cuántos hitos tiene el proyecto.");
       return;
     }
 
@@ -76,7 +76,7 @@ export function ModalNuevoPlan({ patientId, isOpen, onClose, onSuccess }: Props)
     setIsSaving(false);
 
     if (result.success) {
-      toast.success("Hoja de ruta creada correctamente.");
+      toast.success("Proyecto creado correctamente.");
       setForm(EMPTY_FORM);
       onSuccess();
       onClose();
@@ -108,7 +108,7 @@ export function ModalNuevoPlan({ patientId, isOpen, onClose, onSuccess }: Props)
                 <Target className="w-6 h-6" />
               </div>
               <div>
-                <h2 className="text-2xl font-black text-white tracking-tight font-heading">Nueva Hoja de Ruta</h2>
+                <h2 className="text-2xl font-black text-white tracking-tight font-heading">Nuevo Proyecto</h2>
                 <p className="text-[10px] font-black text-brand-primary uppercase tracking-[0.2em] mt-1">Definición de hitos y entregables</p>
               </div>
             </div>
@@ -148,7 +148,7 @@ export function ModalNuevoPlan({ patientId, isOpen, onClose, onSuccess }: Props)
             </div>
 
             {/* Nombre */}
-            <FieldWrapper label="Nombre del Proyecto / Roadmap *">
+            <FieldWrapper label="Nombre del Proyecto *">
               <Input
                 placeholder="Ej: Desarrollo de Plataforma E-learning Fase 1"
                 value={form.treatment_name}
@@ -276,7 +276,7 @@ export function ModalNuevoPlan({ patientId, isOpen, onClose, onSuccess }: Props)
               {isSaving ? (
                 <><Loader2 className="w-5 h-5 mr-3 animate-spin" />Iniciando...</>
               ) : (
-                "Crear Hoja de Ruta"
+                "Crear Proyecto"
               )}
             </Button>
           </div>

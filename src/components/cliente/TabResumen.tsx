@@ -75,7 +75,7 @@ export function TabResumen({ patient, activePlan, lastVisit, totalSessions }: Pr
       icon: <Rocket className="w-5 h-5" />,
       title: `Proyecto Urgente`,
       detail: patient.medication_details ?? "Ver detalles de entrega",
-      hint: "Prioridad máxima en el roadmap del estudio.",
+      hint: "Prioridad máxima en el plan de desarrollo del estudio.",
     },
     patient.has_illnesses && {
       color: "emerald",
@@ -123,26 +123,6 @@ export function TabResumen({ patient, activePlan, lastVisit, totalSessions }: Pr
         </div>
       )}
 
-      {/* STATS RÁPIDOS */}
-      <div className="grid grid-cols-3 gap-4">
-        <StatCard
-          value={totalSessions}
-          label="Interacciones"
-          color="violet"
-        />
-        <StatCard
-          value={patient.age ?? "—"}
-          label="Prioridad"
-          color="emerald"
-        />
-        <StatCard
-          value={memberSince.replace("hace ", "")}
-          label="Registro"
-          color="slate"
-          small
-        />
-      </div>
-
       {/* PROYECTO ACTIVO */}
       {activePlan ? (
         <div className="glass-card p-8 border border-brand-primary/30 relative overflow-hidden group">
@@ -153,7 +133,7 @@ export function TabResumen({ patient, activePlan, lastVisit, totalSessions }: Pr
                 <div className="p-2.5 bg-brand-primary/20 rounded-xl text-brand-primary border border-brand-primary/30">
                     <Activity className="w-5 h-5" />
                 </div>
-                <p className="text-[10px] font-black text-brand-primary uppercase tracking-[0.2em]">Hoja de Ruta Activa</p>
+                <p className="text-[10px] font-black text-brand-primary uppercase tracking-[0.2em]">Proyecto Activo</p>
             </div>
 
             <h3 className="text-2xl font-black text-white mb-2 font-heading tracking-tight">{activePlan.treatment_name}</h3>
@@ -192,7 +172,7 @@ export function TabResumen({ patient, activePlan, lastVisit, totalSessions }: Pr
           </div>
           <div className="space-y-1">
             <p className="text-white font-black uppercase tracking-widest text-sm">Sin proyecto activo</p>
-            <p className="text-slate-500 text-xs font-medium">Define el alcance para iniciar el desarrollo del roadmap.</p>
+            <p className="text-slate-500 text-xs font-medium">Define el alcance para iniciar el desarrollo del proyecto.</p>
           </div>
         </div>
       )}

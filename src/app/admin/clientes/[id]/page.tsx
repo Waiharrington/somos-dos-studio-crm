@@ -33,7 +33,7 @@ const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
   { id: "descubrimiento", label: "Análisis", icon: Code },
   { id: "historial", label: "Bitácora", icon: ClipboardList },
   { id: "fotos", label: "Galería", icon: ImageIcon },
-  { id: "planes", label: "Hoja de Ruta", icon: Activity },
+  { id: "planes", label: "Proyectos", icon: Activity },
 ];
 
 export default function ClienteDetailPage() {
