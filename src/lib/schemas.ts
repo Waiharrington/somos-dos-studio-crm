@@ -16,6 +16,7 @@ export const servicesSchema = z.object({
 export const scopeSchema = z.object({
     agreedBudget: z.string().optional(),
     paymentMode: z.string().optional(),
+    customPaymentDetails: z.string().optional(),
 });
 
 export const treatmentSchema = z.object({

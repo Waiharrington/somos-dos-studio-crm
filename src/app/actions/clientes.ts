@@ -55,7 +55,7 @@ export async function saveClienteAction(formData: ClienteFormData) {
                         project: treatment
                     },
 
-                    signature_data: null,
+                    signature_data: "N/A (CRM Interno)",
                     consent_accepted: true,
                     status: 'Prospecto'
                 }

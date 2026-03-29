@@ -45,6 +45,7 @@ export default function Wizard() {
             scope: {
                 agreedBudget: "",
                 paymentMode: "",
+                customPaymentDetails: "",
             },
             treatment: {
                 objective: "",
