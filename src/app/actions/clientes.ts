@@ -70,6 +70,16 @@ export async function saveClienteAction(formData: ClienteFormData) {
         const budgetRaw = scope.agreedBudget?.replace(/[^0-9.]/g, '') || "0";
         const budgetValue = isNaN(parseFloat(budgetRaw)) ? 0 : parseFloat(budgetRaw);
 
+        // Mapeo de modalidad de pago para cumplir con la restricción de DB (chk_treatment_plans_payment_type)
+        // Valores permitidos: 'full', 'per_session', 'installments'
+        let dbPaymentType = 'per_session';
+        const mode = scope.paymentMode?.toLowerCase();
+        if (mode === 'unico') {
+            dbPaymentType = 'full';
+        } else if (mode === 'quincenal' || mode === 'semanal' || mode === 'personalizado') {
+            dbPaymentType = 'installments';
+        }
+
         const { error: planError } = await supabase
             .from("treatment_plans")
             .insert([
@@ -78,7 +88,7 @@ export async function saveClienteAction(formData: ClienteFormData) {
                     treatment_name: personal.projectName || "Nuevo Proyecto",
                     total_sessions: 1,
                     price_total: budgetValue,
-                    payment_type: scope.paymentMode?.toLowerCase() || "custom",
+                    payment_type: dbPaymentType,
                     notes: `
 OBJETIVO: ${treatment.objective || "N/A"}
 REFERENCIAS: ${treatment.references || "N/A"}
@@ -112,7 +122,7 @@ PAGO PERSONALIZADO: ${scope.customPaymentDetails || "N/A"}
         if (err instanceof Error) {
             errorMessage = err.message;
         } else if (typeof err === 'object' && err !== null && 'message' in err) {
-            errorMessage = String((err as any).message);
+            errorMessage = String((err as Record<string, unknown>).message);
         }
         
         return { success: false, error: errorMessage };
