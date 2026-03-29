@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const personalDataSchema = z.object({
+    projectName: z.string().min(3, "El nombre del proyecto es obligatorio"),
     firstName: z.string().min(2, "El nombre es muy corto"),
     lastName: z.string().min(2, "El apellido es muy corto"),
     phone: z.string().min(7, "Teléfono inválido"),

@@ -32,6 +32,7 @@ export default function Wizard() {
         mode: "onChange",
         defaultValues: {
             personal: {
+                projectName: "",
                 firstName: "",
                 lastName: "",
                 phone: "",
@@ -77,6 +78,7 @@ export default function Wizard() {
     };
 
     const fillDemoData = () => {
+        methods.setValue("personal.projectName", "Sistema de Gestión CRM");
         methods.setValue("personal.firstName", "Waiharrington");
         methods.setValue("personal.lastName", "Studio");
         methods.setValue("personal.phone", "+58 412 0000000");

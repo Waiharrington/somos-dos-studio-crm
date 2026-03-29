@@ -65,7 +65,6 @@ export async function saveClienteAction(formData: ClienteFormData) {
 
         // 3. CREAR EL PROYECTO (TREATMENT PLAN)
         // Mapeamos los campos del formulario a la estructura del plan
-        const projectName = discovery.selectedServices?.join(", ") || "Nuevo Proyecto";
         const budgetValue = parseFloat(scope.agreedBudget?.replace(/[^0-9.]/g, '') || "0");
 
         const { error: planError } = await supabase
@@ -73,7 +72,7 @@ export async function saveClienteAction(formData: ClienteFormData) {
             .insert([
                 {
                     patient_id: patientId,
-                    treatment_name: projectName,
+                    treatment_name: personal.projectName || "Nuevo Proyecto",
                     total_sessions: 1, // En agencia, 1 proyecto = 1 plan usualmente
                     price_total: budgetValue,
                     payment_type: scope.paymentMode?.toLowerCase() || "custom",
@@ -195,6 +194,26 @@ export async function getClienteByIdNumberAction(idNumber: string) {
         return { success: true, data };
     } catch (err: unknown) {
         console.error("Lookup Error:", err);
+        return { success: false, error: "Error en búsqueda" };
+    }
+}
+
+/**
+ * Busca un cliente por teléfono.
+ */
+export async function getClienteByPhoneAction(phone: string) {
+    try {
+        const supabase = await createClient();
+        const { data, error } = await supabase
+            .from("patients")
+            .select("id, first_name, last_name, id_number")
+            .eq("phone", phone)
+            .maybeSingle();
+
+        if (error) throw error;
+        return { success: true, data };
+    } catch (err: unknown) {
+        console.error("Phone Lookup Error:", err);
         return { success: false, error: "Error en búsqueda" };
     }
 }
