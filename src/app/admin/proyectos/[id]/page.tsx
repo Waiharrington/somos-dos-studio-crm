@@ -15,7 +15,12 @@ import {
     Rocket,
     Target,
     DollarSign,
-    ExternalLink
+    ExternalLink,
+    Code,
+    Layers,
+    Layout,
+    ShieldCheck,
+    History
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -50,6 +55,43 @@ const PAYMENT_LABELS: Record<string, string> = {
   full:         "Pago Único",
   installments: "Retainer Mensual",
 };
+
+// ─────────────────────────────────────────────
+// COMPONENTES AUXILIARES
+// ─────────────────────────────────────────────
+
+function InfoItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="space-y-1.5 p-4 rounded-2xl bg-white/[0.02] border border-white/5 group hover:bg-white/5 transition-colors">
+      <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] group-hover:text-brand-primary transition-colors">{label}</p>
+      <p className="text-xs font-black text-white tracking-tight">{value}</p>
+    </div>
+  );
+}
+
+function DiscoveryItem({ label, value, status, icon }: { 
+  label: string; value: string; status: "ok" | "warning" | "danger" | "info"; icon: React.ReactNode 
+}) {
+  return (
+    <div className="group flex items-start gap-4 p-4 rounded-2xl hover:bg-white/5 transition-all border border-transparent hover:border-white/5">
+      <div className="mt-1 text-slate-600 group-hover:text-brand-primary transition-colors">
+        {icon}
+      </div>
+      <div className="space-y-1 flex-1">
+        <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]">{label}</p>
+        <div className="flex items-center gap-2">
+          <p className="text-[11px] font-bold text-slate-200 leading-tight tracking-tight group-hover:text-white transition-colors">{value}</p>
+          <div className={cn(
+            "h-1 w-1 rounded-full flex-shrink-0 animate-pulse",
+            status === "ok" ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" :
+            status === "warning" ? "bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" :
+            status === "danger" ? "bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]" : "bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"
+          )} />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // ─────────────────────────────────────────────
 // COMPONENTE PRINCIPAL
@@ -271,6 +313,63 @@ export default function ProyectoDetailPage() {
               <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-line font-medium">
                 {proyecto.notes || "No hay notas adicionales registradas para este proyecto."}
               </p>
+            </div>
+          </div>
+
+          {/* ── SECCIÓN DE DESCUBRIMIENTO (ANÁLISIS) ── */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="glass-card p-8 border-white/5 bg-gradient-to-br from-violet-500/5 to-transparent">
+               <div className="flex items-center gap-3 mb-8 font-black text-[10px] uppercase tracking-widest text-violet-400">
+                  <Code className="w-4 h-4" />
+                  Análisis Técnico (Fase 1)
+               </div>
+               <div className="space-y-4">
+                  <DiscoveryItem 
+                    label="Base de Código" 
+                    value={proyecto.patients?.has_surgeries ? (proyecto.patients.surgeries_details || "Existente / Por auditar") : "Proyecto Green-Field"} 
+                    status={proyecto.patients?.has_surgeries ? "info" : "ok"}
+                    icon={<History className="w-4 h-4" />}
+                  />
+                  <DiscoveryItem 
+                    label="Ecosistema Tech" 
+                    value={proyecto.patients?.has_allergies ? (proyecto.patients.allergies_details || "Propuesto por cliente") : "Definición por Estudio"} 
+                    status={proyecto.patients?.has_allergies ? "info" : "warning"}
+                    icon={<Layers className="w-4 h-4" />}
+                  />
+                  <DiscoveryItem 
+                    label="Prototipos / Figma" 
+                    value={proyecto.patients?.has_illnesses ? "Disponibles / Ver Enlaces" : "Sprint de Diseño Pendiente"} 
+                    status={proyecto.patients?.has_illnesses ? "ok" : "warning"}
+                    icon={<Layout className="w-4 h-4" />}
+                  />
+               </div>
+            </div>
+
+            <div className="glass-card p-8 border-white/5 bg-gradient-to-br from-emerald-500/5 to-transparent">
+               <div className="flex items-center gap-3 mb-8 font-black text-[10px] uppercase tracking-widest text-emerald-400">
+                  <Target className="w-4 h-4" />
+                  Estrategia Comercial
+               </div>
+               <div className="space-y-4">
+                  <DiscoveryItem 
+                    label="Inversión Estimada" 
+                    value={proyecto.patients?.smokes ? `Rango: ${proyecto.patients.smoking_amount || "Por confirmar"}` : "Presupuesto Abierto"} 
+                    status={proyecto.patients?.smokes ? "ok" : "warning"}
+                    icon={<DollarSign className="w-4 h-4" />}
+                  />
+                  <DiscoveryItem 
+                    label="Benchmarking" 
+                    value={proyecto.patients?.skin_routine || "Sin referencias externas"} 
+                    status="info"
+                    icon={<ShieldCheck className="w-4 h-4" />}
+                  />
+                  <DiscoveryItem 
+                    label="Perfil de Usuario" 
+                    value={proyecto.patients?.exercise_details || "Generalista"} 
+                    status="info"
+                    icon={<Target className="w-4 h-4" />}
+                  />
+               </div>
             </div>
           </div>
         </div>

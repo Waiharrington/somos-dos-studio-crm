@@ -1,7 +1,17 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { ArrowLeft, User, ClipboardList, ImageIcon, Activity, Loader2, AlertTriangle, Plus, FileText, Code } from "lucide-react";
+import { 
+    ArrowLeft, 
+    User, 
+    ClipboardList, 
+    ImageIcon, 
+    Activity, 
+    Loader2, 
+    AlertTriangle, 
+    Plus, 
+    FileText 
+} from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -19,18 +29,16 @@ import { TabResumen } from "@/components/cliente/TabResumen";
 import { TabHistorial } from "@/components/cliente/TabHistorial";
 import { TabFotos } from "@/components/cliente/TabFotos";
 import { TabPlanes } from "@/components/cliente/TabPlanes";
-import { TabExpediente } from "@/components/cliente/TabExpediente";
 import { ModalNuevoSprintLog } from "@/components/cliente/ModalNuevoSprintLog";
 
 // ─────────────────────────────────────────────
 // TIPOS
 // ─────────────────────────────────────────────
 
-type TabId = "resumen" | "descubrimiento" | "historial" | "fotos" | "planes";
+type TabId = "resumen" | "historial" | "fotos" | "planes";
 
 const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
   { id: "resumen", label: "Perfil", icon: User },
-  { id: "descubrimiento", label: "Análisis", icon: Code },
   { id: "historial", label: "Bitácora", icon: ClipboardList },
   { id: "fotos", label: "Galería", icon: ImageIcon },
   { id: "planes", label: "Proyectos", icon: Activity },
@@ -221,9 +229,6 @@ export default function ClienteDetailPage() {
                     lastVisit={lastVisit}
                     totalSessions={completedSessions}
                 />
-                )}
-                {activeTab === "descubrimiento" && (
-                <TabExpediente patient={cliente} />
                 )}
                 {activeTab === "historial" && (
                 <TabHistorial visits={visits} />
