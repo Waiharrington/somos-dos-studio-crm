@@ -78,11 +78,11 @@ export default function ProyectosPage() {
                 <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
                     <div className="space-y-4">
                         <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-blue-500/10 text-blue-400 text-[10px] font-black tracking-[0.2em] uppercase border border-blue-500/20">
-                            Roadmap Agency
+                            Gestión de Proyectos
                         </div>
                         <h1 className="text-4xl md:text-6xl font-black text-white tracking-tight leading-tight font-heading">
-                            Hojas de <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">Ruta</span>
+                            Listado de <br />
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">Proyectos</span>
                         </h1>
                         <p className="text-slate-400 font-medium max-w-md text-sm leading-relaxed">
                             Seguimiento global de todos los proyectos activos, presupuestos y entregas técnicas de la agencia.
@@ -204,8 +204,8 @@ export default function ProyectosPage() {
                                         </td>
                                         <td className="px-10 py-6 text-right">
                                             <div className="flex items-center justify-end gap-2">
-                                                <Link href={`/admin/clientes/${proyecto.patient_id}?tab=planes`}>
-                                                    <Button variant="ghost" title="Ver en Perfil" className="h-10 w-10 p-0 rounded-xl text-slate-500 hover:text-white hover:bg-white/10 transition-all">
+                                                <Link href={`/admin/proyectos/${proyecto.id}`}>
+                                                    <Button variant="ghost" title="Gestionar Proyecto" className="h-10 w-10 p-0 rounded-xl text-slate-500 hover:text-white hover:bg-white/10 transition-all">
                                                         <ExternalLink className="w-4 h-4" />
                                                     </Button>
                                                 </Link>

@@ -96,9 +96,9 @@ export async function getPlansByPatientAction(patient_id: string) {
     if (error) throw error;
 
     // Calcular sesiones completadas por plan
-    const plansWithProgress = (plans ?? []).map((plan: any) => {
-      const completedSessions = (plan.visits ?? []).filter(
-        (v: { status: string }) => v.status === "completed"
+    const plansWithProgress = (plans ?? []).map((plan) => {
+      const completedSessions = (plan.visits as { status: string }[] ?? []).filter(
+        (v) => v.status === "completed"
       ).length;
 
       return {
@@ -182,7 +182,7 @@ export async function updateTreatmentPlanAction(
 ) {
   try {
     const supabase = await createClient();
-    const payload: any = { ...input };
+    const payload: Record<string, unknown> = { ...input };
 
     // Si se marca como completado, guardamos la fecha
     if (input.status === "completed" && !input.completed_at) {
@@ -202,6 +202,8 @@ export async function updateTreatmentPlanAction(
     }
 
     revalidatePath(`/admin/clientes/${patient_id}`);
+    revalidatePath(`/admin/proyectos`);
+    revalidatePath(`/admin/proyectos/${plan_id}`);
 
     return { success: true, data };
   } catch (err: unknown) {
@@ -231,10 +233,12 @@ export async function deleteTreatmentPlanAction(
     }
 
     revalidatePath(`/admin/clientes/${patient_id}`);
+    revalidatePath(`/admin/proyectos`);
     return { success: true };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("deleteTreatmentPlanAction:", err);
-    return { success: false, error: err.message ?? "Error desconocido" };
+    const errorMessage = err instanceof Error ? err.message : "Error desconocido";
+    return { success: false, error: errorMessage };
   }
 }
 
@@ -261,8 +265,66 @@ export async function getAllProjectsAction() {
     if (error) throw error;
 
     return { success: true, data: projects };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("getAllProjectsAction:", err);
-    return { success: false, error: err.message, data: [] };
+    const errorMessage = err instanceof Error ? err.message : "Error desconocido";
+    return { success: false, error: errorMessage, data: [] };
+  }
+}
+
+// ─────────────────────────────────────────────
+// OBTENER PROYECTO POR ID
+// ─────────────────────────────────────────────
+
+export async function getProjectByIdAction(id: string) {
+  try {
+    const supabase = await createClient();
+    const { data: project, error } = await supabase
+      .from("treatment_plans")
+      .select(`
+        *,
+        patients (
+          id,
+          first_name,
+          last_name,
+          phone,
+          email,
+          address,
+          id_number
+        ),
+        visits (
+          id,
+          status,
+          visit_date,
+          treatment_applied,
+          session_number,
+          clinical_notes
+        )
+      `)
+      .eq("id", id)
+      .single();
+
+    if (error) throw error;
+
+    // Calcular progreso
+    const completedSessions = (project.visits as { status: string }[] ?? []).filter(
+      (v) => v.status === "completed"
+    ).length;
+
+    return {
+      success: true,
+      data: {
+        ...project,
+        completed_sessions: completedSessions,
+        progress_percentage:
+          project.total_sessions > 0
+            ? Math.round((completedSessions / project.total_sessions) * 100)
+            : 0,
+      },
+    };
+  } catch (err: unknown) {
+    console.error("getProjectByIdAction:", err);
+    const errorMessage = err instanceof Error ? err.message : "Error desconocido";
+    return { success: false, error: errorMessage };
   }
 }

@@ -165,28 +165,11 @@ export function TabPlanes({ patientId, plans, onRefresh }: Props) {
 // TARJETA DE PLAN
 // ─────────────────────────────────────────────
 
-function PlanCard({ plan, patientId, onRefresh }: {
+function PlanCard({ plan }: {
   plan: Plan;
-  patientId: string;
-  onRefresh: () => void;
 }) {
-  const [expanded, setExpanded]   = useState(false);
-  const [updating, setUpdating]   = useState(false);
   const config = STATUS_CONFIG[plan.status] ?? STATUS_CONFIG.active;
   const StatusIcon = config.icon;
-  const sym    = CURRENCY_SYMBOLS[plan.currency] ?? "$";
-
-  const updateStatus = async (newStatus: PlanStatus) => {
-    setUpdating(true);
-    const result = await updateTreatmentPlanAction(plan.id, patientId, { status: newStatus });
-    setUpdating(false);
-    if (result.success) {
-      toast.success(`Proyecto marcado como ${STATUS_CONFIG[newStatus]?.label ?? newStatus}.`);
-      onRefresh();
-    } else {
-      toast.error(`Error: ${result.error}`);
-    }
-  };
 
   const progressColor =
     plan.progress_percentage >= 100 ? "from-emerald-500 to-emerald-400" :
@@ -194,157 +177,62 @@ function PlanCard({ plan, patientId, onRefresh }: {
     "from-brand-primary/60 to-brand-primary/40";
 
   return (
-    <div className={cn(
-      "glass-card border-white/5 overflow-hidden transition-all duration-300",
-      plan.status === "active" ? "border-brand-primary/20 shadow-xl shadow-brand-primary/5" : "opacity-60 grayscale hover:opacity-100 transition-all"
-    )}>
-
-      {/* Header de la tarjeta */}
-      <button
-        className="w-full text-left p-6 hover:bg-white/[0.02] transition-colors group"
-        onClick={() => setExpanded(!expanded)}
-      >
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex-1 min-w-0">
-            {/* Nombre + estado */}
-            <div className="flex items-center gap-3 flex-wrap mb-4">
-              <h3 className="font-black text-white text-lg tracking-tight font-heading group-hover:text-brand-primary transition-colors">{plan.treatment_name}</h3>
-              <span className={cn(
-                "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border",
-                config.badgeBg, config.badgeText
-              )}>
-                <StatusIcon className="w-3.5 h-3.5" />
-                {config.label}
-              </span>
-            </div>
-            
-            {plan.body_zone && (
-              <div className="flex items-center gap-2 mb-6">
-                 <div className="p-1.5 bg-brand-primary/10 rounded-lg text-brand-primary">
-                    <Rocket className="w-3.5 h-3.5" />
-                 </div>
-                 <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">{plan.body_zone}</p>
-              </div>
-            )}
-
-            {/* Barra de progreso */}
-            <div className="space-y-2">
-              <div className="flex justify-between items-end">
-                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                  Fase {plan.completed_sessions} de {plan.total_sessions} completadas
-                </span>
+    <Link href={`/admin/proyectos/${plan.id}`}>
+      <div className={cn(
+        "glass-card border-white/5 overflow-hidden transition-all duration-300 hover:scale-[1.01] hover:border-brand-primary/30 group",
+        plan.status === "active" ? "border-brand-primary/20 shadow-xl shadow-brand-primary/5" : "opacity-60 grayscale hover:opacity-100 transition-all"
+      )}>
+        <div className="p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3 flex-wrap mb-4">
+                <h3 className="font-black text-white text-lg tracking-tight font-heading group-hover:text-brand-primary transition-colors">{plan.treatment_name}</h3>
                 <span className={cn(
-                  "text-xl font-black tracking-tighter",
-                  plan.progress_percentage >= 100 ? "text-emerald-400" : "text-brand-primary"
+                  "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border",
+                  config.badgeBg, config.badgeText
                 )}>
-                  {plan.progress_percentage}%
+                  <StatusIcon className="w-3.5 h-3.5" />
+                  {config.label}
                 </span>
               </div>
-              <div className="h-2 bg-white/5 rounded-full overflow-hidden border border-white/5 p-0.5">
-                <div
-                  className={cn("h-full rounded-full transition-all duration-1000 ease-out bg-gradient-to-r shadow-lg", progressColor)}
-                  style={{ width: `${Math.min(plan.progress_percentage, 100)}%` }}
-                />
+              
+              {plan.body_zone && (
+                <div className="flex items-center gap-2 mb-6">
+                   <div className="p-1.5 bg-brand-primary/10 rounded-lg text-brand-primary">
+                      <Rocket className="w-3.5 h-3.5" />
+                   </div>
+                   <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">{plan.body_zone}</p>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <div className="flex justify-between items-end">
+                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                    Fase {plan.completed_sessions} de {plan.total_sessions} completadas
+                  </span>
+                  <span className={cn(
+                    "text-xl font-black tracking-tighter",
+                    plan.progress_percentage >= 100 ? "text-emerald-400" : "text-brand-primary"
+                  )}>
+                    {plan.progress_percentage}%
+                  </span>
+                </div>
+                <div className="h-2 bg-white/5 rounded-full overflow-hidden border border-white/5 p-0.5">
+                  <div
+                    className={cn("h-full rounded-full transition-all duration-1000 ease-out bg-gradient-to-r shadow-lg", progressColor)}
+                    style={{ width: `${Math.min(plan.progress_percentage, 100)}%` }}
+                  />
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="flex-shrink-0 text-slate-700 mt-2">
-            {expanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+            <div className="flex-shrink-0 text-slate-700 mt-2 self-center bg-white/5 p-3 rounded-2xl border border-white/5 group-hover:text-brand-primary group-hover:bg-brand-primary/10 transition-all">
+               <ChevronDown className="w-5 h-5 -rotate-90" />
+            </div>
           </div>
         </div>
-      </button>
-
-      {/* Detalle expandido */}
-      <AnimatePresence>
-        {expanded && (
-          <motion.div 
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="border-t border-white/5 p-6 bg-white/[0.01]"
-          >
-            <div className="space-y-8">
-                {/* Info Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                    <InfoItem label="Feedback Freq." value={`Cada ${plan.session_interval_days} días`} />
-                    <InfoItem label="Modelo Comercial" value={PAYMENT_LABELS[plan.payment_type] ?? plan.payment_type} />
-                    {plan.price_total && (
-                    <InfoItem label="Inversión total" value={`${sym} ${plan.price_total.toLocaleString()}`} />
-                    )}
-                    {plan.price_per_session && (
-                    <InfoItem label="Costo por Hito" value={`${sym} ${plan.price_per_session.toLocaleString()}`} />
-                    )}
-                    <InfoItem
-                    label="Inicio del Roadmap"
-                    value={format(new Date(plan.created_at), "d MMM yyyy", { locale: es })}
-                    />
-                    {plan.completed_at && (
-                    <InfoItem
-                        label={plan.status === "completed" ? "Entrega de Proyecto" : "Fecha Finalización"}
-                        value={format(new Date(plan.completed_at), "d MMM yyyy", { locale: es })}
-                    />
-                    )}
-                </div>
-
-                {plan.notes && (
-                    <div className="bg-white/5 rounded-[1.5rem] p-5 border border-white/5 shadow-inner">
-                        <div className="text-xs text-slate-400 leading-relaxed font-medium whitespace-pre-line">
-                            <span className="text-brand-primary not-italic font-black text-[10px] uppercase tracking-widest mr-2 block mb-2">Detalles del Proyecto:</span>
-                            {plan.notes}
-                        </div>
-                    </div>
-                )}
-
-                {/* Acciones de estado */}
-                {plan.status === "active" && (
-                    <div className="flex gap-3 pt-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={updating}
-                        onClick={() => updateStatus("paused")}
-                        className="flex-1 rounded-2xl text-[10px] font-black uppercase tracking-widest border-amber-500/20 bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white h-12 transition-all"
-                    >
-                        {updating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Pausar Proyecto"}
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={updating}
-                        onClick={() => updateStatus("completed")}
-                        className="flex-1 rounded-2xl text-[10px] font-black uppercase tracking-widest border-emerald-500/20 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white h-12 transition-all"
-                    >
-                        {updating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Finalizar Proyecto"}
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={updating}
-                        onClick={() => updateStatus("cancelled")}
-                        className="flex-1 rounded-2xl text-[10px] font-black uppercase tracking-widest border-rose-500/20 bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white h-12 transition-all"
-                    >
-                        {updating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Cancelar Todo"}
-                    </Button>
-                    </div>
-                )}
-
-                {plan.status === "paused" && (
-                    <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={updating}
-                    onClick={() => updateStatus("active")}
-                    className="w-full rounded-2xl text-[10px] font-black uppercase tracking-widest border-emerald-500/20 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white h-12 transition-all"
-                    >
-                    {updating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Reactivar Desarrollo"}
-                    </Button>
-                )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+      </div>
+    </Link>
   );
 }
 
