@@ -22,6 +22,8 @@ export type CreatePlanInput = {
   payment_type?:          PaymentType;
   currency?:              Currency;
   notes?:                 string;
+  drive_url?:             string | null;
+  contract_url?:          string | null;
 };
 
 export type UpdatePlanInput = Partial<Omit<CreatePlanInput, "patient_id">> & {
@@ -50,6 +52,8 @@ export async function createTreatmentPlanAction(input: CreatePlanInput) {
           payment_type:           input.payment_type ?? "per_session",
           currency:               input.currency ?? "USD",
           notes:                  input.notes ?? null,
+          drive_url:              input.drive_url ?? null,
+          contract_url:           input.contract_url ?? null,
           status:                 "active",
         },
       ])

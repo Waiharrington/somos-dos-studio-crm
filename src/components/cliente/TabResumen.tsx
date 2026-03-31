@@ -1,9 +1,13 @@
 "use client";
 
-import { Activity, Calendar, Phone, Mail, MapPin, User, Code, Layout, Target, Rocket, Clock } from "lucide-react";
+import { useState } from "react";
+import { Activity, Calendar, Phone, Mail, MapPin, User, Code, Layout, Target, Rocket, Clock, Key, Globe, Eye, EyeOff, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format, formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
+import { setClientPasswordAction } from "@/app/actions/clientes";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 // ─────────────────────────────────────────────
 // TIPOS
@@ -69,6 +73,28 @@ export function TabResumen({ patient, activePlan, lastVisit, totalSessions }: Pr
     addSuffix: true,
   });
 
+  const [newPassword, setNewPassword] = useState("");
+  const [isUpdatingPass, setIsUpdatingPass] = useState(false);
+  const [showPass, setShowPass] = useState(false);
+
+  const handleSavePassword = async () => {
+    if (!newPassword || newPassword.length < 6) {
+      toast.error("La contraseña debe tener al menos 6 caracteres");
+      return;
+    }
+
+    setIsUpdatingPass(true);
+    const result = await setClientPasswordAction(patient.id, newPassword);
+    setIsUpdatingPass(false);
+
+    if (result.success) {
+      toast.success("Contraseña de acceso actualizada correctamente.");
+      setNewPassword("");
+    } else {
+      toast.error(`Error: ${result.error}`);
+    }
+  };
+
   const alerts = [
     patient.takes_medication && {
       color: "red",
@@ -109,19 +135,35 @@ export function TabResumen({ patient, activePlan, lastVisit, totalSessions }: Pr
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
 
-      {/* ALERTAS DE DESCUBRIMIENTO */}
-      {alerts.length > 0 && (
-        <div className="space-y-4">
-          <p className="text-[10px] font-black text-brand-primary/40 uppercase tracking-[0.2em] ml-2">
-            Insights Estratégicos
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {alerts.map((alert, i) => (
-                <AlertCard key={i} {...alert} />
-            ))}
-          </div>
+      {/* ALERTAS DE DESCUBRIMIENTO Y ACCESO */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-4">
+          {alerts.length > 0 && (
+            <>
+              <p className="text-[10px] font-black text-brand-primary/40 uppercase tracking-[0.2em] ml-2">
+                Insights Estratégicos
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {alerts.map((alert, i) => (
+                  <AlertCard key={i} {...alert} />
+                ))}
+              </div>
+            </>
+          )}
         </div>
-      )}
+        
+        <div className="lg:col-span-1">
+          <PortalAccessCard 
+            email={patient.email || ""}
+            password={newPassword}
+            setPassword={setNewPassword}
+            onSave={handleSavePassword}
+            isUpdating={isUpdatingPass}
+            showPass={showPass}
+            setShowPass={setShowPass}
+          />
+        </div>
+      </div>
 
       {/* PROYECTO ACTIVO */}
       {activePlan ? (
@@ -281,6 +323,86 @@ function ContactRow({ icon, value }: { icon: React.ReactNode; value: string }) {
     <div className="flex items-center gap-4 text-slate-300 group cursor-default">
       <span className="text-brand-primary/40 flex-shrink-0 bg-white/5 p-2 rounded-lg border border-white/5 group-hover:text-brand-primary group-hover:border-brand-primary/30 transition-all">{icon}</span>
       <span className="text-sm font-bold tracking-tight">{value}</span>
+    </div>
+  );
+}
+
+function PortalAccessCard({ 
+  email, 
+  onSave, 
+  isUpdating, 
+  password, 
+  setPassword, 
+  showPass, 
+  setShowPass 
+}: { 
+  email: string; 
+  onSave: () => void; 
+  isUpdating: boolean; 
+  password: string; 
+  setPassword: (v: string) => void;
+  showPass: boolean;
+  setShowPass: (v: boolean) => void;
+}) {
+  return (
+    <div className="glass-card p-6 border-white/5 bg-gradient-to-br from-brand-primary/5 to-transparent relative overflow-hidden group h-full flex flex-col">
+      <div className="absolute top-0 right-0 w-32 h-32 radial-glow-purple opacity-10 -translate-y-1/2 translate-x-1/2 blur-[40px]" />
+      
+      <div className="flex items-center gap-3 mb-6">
+        <div className="p-2.5 bg-brand-primary/20 rounded-xl text-brand-primary group-hover:rotate-6 transition-all border border-brand-primary/20 shadow-lg shadow-brand-primary/10">
+          <Key className="w-4 h-4" />
+        </div>
+        <div>
+          <h3 className="text-sm font-black text-white tracking-tight leading-none font-heading">Acceso al Portal</h3>
+          <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-1.5">Clave del cliente</p>
+        </div>
+      </div>
+
+      <div className="space-y-4 flex-1 flex flex-col justify-between">
+        <div className="space-y-4">
+          <div className="space-y-1.5">
+            <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Correo</p>
+            <div className="flex items-center gap-2 p-3 bg-white/5 rounded-xl border border-white/10 group-hover:border-white/20 transition-all">
+              <Mail className="w-3.5 h-3.5 text-brand-primary" />
+              <span className="text-xs font-bold text-white truncate">{email || "Sin correo"}</span>
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Clave</p>
+            <div className="relative">
+              <input 
+                type={showPass ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Mínimo 6 chars"
+                className="w-full h-11 bg-white/5 rounded-xl border border-white/10 px-4 text-xs font-bold text-white tracking-tight focus:ring-1 focus:ring-brand-primary/50 focus:border-brand-primary transition-all outline-none"
+              />
+              <button 
+                onClick={() => setShowPass(!showPass)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+              >
+                {showPass ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="pt-4 space-y-3">
+          <Button 
+            onClick={onSave}
+            disabled={isUpdating || !password || !email}
+            className="w-full h-11 rounded-xl bg-brand-primary hover:bg-brand-primary/90 text-white font-black text-[9px] uppercase tracking-[0.2em] transition-all shadow-lg shadow-brand-primary/10 border-none"
+          >
+            {isUpdating ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-2" /> : <Globe className="w-3.5 h-3.5 mr-2" />}
+            Guardar
+          </Button>
+          
+          <p className="text-[8px] text-center text-slate-600 font-medium leading-tight">
+            * Acceso en <span className="text-brand-primary">/portal</span>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

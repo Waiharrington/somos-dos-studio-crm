@@ -4,6 +4,7 @@ import { type ClienteFormData } from "@/lib/schemas";
 import { revalidatePath } from "next/cache";
 import { sendNewPatientNotification } from "@/lib/email";
 import { createClient } from "@/lib/supabase-server";
+import bcrypt from "bcryptjs";
 
 /**
  * Guarda un nuevo cliente en la base de datos de Somos Dos Studio.
@@ -237,5 +238,35 @@ export async function getClienteByPhoneAction(phone: string) {
     } catch (err: unknown) {
         console.error("Phone Lookup Error:", err);
         return { success: false, error: "Error en búsqueda" };
+    }
+}
+
+// ─────────────────────────────────────────────
+// GESTION DE ACCESO AL PORTAL (ADMIN)
+// ─────────────────────────────────────────────
+
+/**
+ * Establece o actualiza la contraseña de acceso al portal para un cliente.
+ */
+export async function setClientPasswordAction(patientId: string, plainPassword: string) {
+    try {
+        const supabase = await createClient();
+        
+        // Generar hash seguro
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(plainPassword, salt);
+
+        const { error } = await supabase
+            .from("patients")
+            .update({ portal_password: hashedPassword })
+            .eq("id", patientId);
+
+        if (error) throw error;
+
+        revalidatePath(`/admin/clientes/${patientId}`);
+        return { success: true };
+    } catch (err: unknown) {
+        console.error("setClientPasswordAction Error:", err);
+        return { success: false, error: err instanceof Error ? err.message : "Error al establecer contraseña" };
     }
 }

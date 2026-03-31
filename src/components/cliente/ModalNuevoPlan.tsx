@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createTreatmentPlanAction, type CreatePlanInput, type PaymentType, type Currency } from "@/app/actions/plans";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
 type Props = {
@@ -25,6 +26,8 @@ const EMPTY_FORM = {
   payment_type: "full" as PaymentType,
   currency: "USD" as Currency,
   notes: "",
+  drive_url: "",
+  contract_url: "",
 };
 
 const COMMON_SERVICES = [
@@ -70,6 +73,8 @@ export function ModalNuevoPlan({ patientId, isOpen, onClose, onSuccess }: Props)
       payment_type:          form.payment_type,
       currency:              form.currency,
       notes:                 form.notes || undefined,
+      drive_url:             form.drive_url || null,
+      contract_url:          form.contract_url || null,
     };
 
     const result = await createTreatmentPlanAction(input);
@@ -255,6 +260,33 @@ export function ModalNuevoPlan({ patientId, isOpen, onClose, onSuccess }: Props)
                 className="w-full px-6 py-4 text-sm font-bold rounded-2xl border border-white/5 bg-white/5 text-white resize-none focus:outline-none focus:border-brand-primary/50 transition-all placeholder:text-slate-700 h-32"
               />
             </FieldWrapper>
+    
+            <div className="bg-white/[0.02] rounded-[2.5rem] p-8 space-y-8 border border-white/5 shadow-inner">
+              <p className="text-[10px] font-black text-brand-secondary uppercase tracking-[0.2em] ml-2">
+                Recursos Externos (Portal de Cliente)
+              </p>
+              
+              <div className="space-y-6">
+                <FieldWrapper label="Carpeta de Multimedia (Google Drive)">
+                  <Input
+                    placeholder="https://drive.google.com/drive/u/0/folders/..."
+                    value={form.drive_url}
+                    onChange={(e) => set("drive_url", e.target.value)}
+                    className="rounded-2xl border-white/5 bg-brand-dark h-14 text-sm font-bold text-white placeholder:text-slate-700"
+                  />
+                </FieldWrapper>
+    
+                <FieldWrapper label="Enlace al Contrato / Acuerdo">
+                  <Input
+                    placeholder="https://example.com/contrato.pdf"
+                    value={form.contract_url}
+                    onChange={(e) => set("contract_url", e.target.value)}
+                    className="rounded-2xl border-white/5 bg-brand-dark h-14 text-sm font-bold text-white placeholder:text-slate-700"
+                  />
+                </FieldWrapper>
+              </div>
+            </div>
+
 
           </div>
 

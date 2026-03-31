@@ -35,25 +35,45 @@ export async function middleware(request: NextRequest) {
     )
 
     // Usamos getSession en el middleware para mayor velocidad y evitar Timeouts en Vercel.
-    // getSession solo verifica la cookie, getUser hace una llamada extra al servidor de Supabase.
     const { data: { session } } = await supabase.auth.getSession()
     const user = session?.user
 
-    // Protección de rutas /admin
+    // ─────────────────────────────────────────────
+    // PROTECCIÓN DEL PANEL ADMIN
+    // ─────────────────────────────────────────────
     if (request.nextUrl.pathname.startsWith('/admin')) {
         if (!user) {
             return NextResponse.redirect(new URL('/login', request.url))
         }
     }
 
-    // Si ya está logueado y va al login, redirigir al admin
     if (request.nextUrl.pathname === '/login' && user) {
         return NextResponse.redirect(new URL('/admin', request.url))
     }
 
-    return response
+    // ─────────────────────────────────────────────
+    // PROTECCIÓN DEL PORTAL DE CLIENTE
+    // ─────────────────────────────────────────────
+    const portalSession = request.cookies.get('portal_session')?.value;
+
+    if (request.nextUrl.pathname.startsWith('/portal')) {
+        // Permitir acceso a la página de login si no hay sesión
+        if (request.nextUrl.pathname === '/portal/login') {
+            if (portalSession) {
+                return NextResponse.redirect(new URL('/portal/dashboard', request.url))
+            }
+            return response;
+        }
+
+        // Proteger el resto de las rutas del portal
+        if (!portalSession) {
+            return NextResponse.redirect(new URL('/portal/login', request.url))
+        }
+    }
+
+    return response;
 }
 
 export const config = {
-    matcher: ['/admin/:path*', '/login'],
+    matcher: ['/admin/:path*', '/login', '/portal/:path*'],
 }
